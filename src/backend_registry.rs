@@ -177,17 +177,21 @@ pub fn spawn(
         let mut last_refresh = Instant::now();
 
         loop {
-            let pubsub_client =
-                match sentin8::middleware::valkey_client_pubsub(&pubsub_url, "sentin8:proxy").await {
-                    Ok(c) => c,
-                    Err(e) => {
-                        tracing::warn!(error = ?e, "prox Valkey pubsub connect failed; safety poll only");
-                        tokio::time::sleep(safety).await;
-                        refresh(&conn, &reg).await;
-                        last_refresh = Instant::now();
-                        continue;
-                    }
-                };
+            let pubsub_client = match sentin8::middleware::valkey_client_pubsub(
+                &pubsub_url,
+                "sentin8:proxy",
+            )
+            .await
+            {
+                Ok(c) => c,
+                Err(e) => {
+                    tracing::warn!(error = ?e, "prox Valkey pubsub connect failed; safety poll only");
+                    tokio::time::sleep(safety).await;
+                    refresh(&conn, &reg).await;
+                    last_refresh = Instant::now();
+                    continue;
+                }
+            };
             use glide::PubSubCommands as _;
             if let Err(e) = pubsub_client.subscribe(&["captain:changed"]).await {
                 tracing::warn!(error = %e, "prox Valkey subscribe failed; safety poll only");
@@ -222,10 +226,7 @@ pub fn spawn(
 /// Read ALL service instances from Valkey and swap each service's list.
 async fn refresh(conn: &glide::GlideClient, registry: &ServiceBackendRegistry) {
     // SCAN all captain:svc:* keys.
-    let keys: Vec<String> = conn
-        .keys("captain:svc:*")
-        .await
-        .unwrap_or_default();
+    let keys: Vec<String> = conn.keys("captain:svc:*").await.unwrap_or_default();
 
     let now = chrono::Utc::now().timestamp();
     let mut total_instances = 0usize;

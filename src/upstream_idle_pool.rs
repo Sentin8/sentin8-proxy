@@ -127,7 +127,6 @@ impl UpstreamPool {
         self.inner.entries.lock().map(|m| m.len()).unwrap_or(0)
     }
 
-
     /// Evict entries idle longer than [`IDLE_TIMEOUT`]. Called by the
     /// background sweep task; also prunes when the pool is consulted so
     /// an unflushed eviction cannot serve a very-long-idle socket.

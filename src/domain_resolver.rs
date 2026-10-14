@@ -35,17 +35,17 @@ fn resolve_service_name(
     known_services: &HashSet<String>,
     subdomain_map: &HashMap<String, String>,
 ) -> String {
- // Check the subdomain map first — this is the authoritative path.
- // e.g. `auth` → `sentin8-auth`, `func` → `sentin8-func`,
- // `bank8-ledger` → `bank8-ledger`.
+    // Check the subdomain map first — this is the authoritative path.
+    // e.g. `auth` → `sentin8-auth`, `func` → `sentin8-func`,
+    // `bank8-ledger` → `bank8-ledger`.
     if let Some(service_type) = subdomain_map.get(label) {
         return service_type.clone();
     }
- // Fall back to known_services (for labels that match service_type directly).
+    // Fall back to known_services (for labels that match service_type directly).
     if known_services.contains(label) {
         return label.to_string();
     }
- // Unknown label → app instance, route to web.
+    // Unknown label → app instance, route to web.
     "sentin8:web".to_string()
 }
 
@@ -134,17 +134,17 @@ fn platform_service_for_label(label: &str) -> Option<String> {
 #[derive(Clone)]
 /// The domainresolver type.
 pub struct DomainResolver {
- /// hostname → app instance mapping
+    /// hostname → app instance mapping
     apps: Arc<RwLock<HashMap<String, AppRow>>>,
- /// Known service types from sentin8_vertical_services + platform services.
- /// e.g. {"sentin8:auth", "sentin8:storage", "bank8:ledger", "bank8:fdx", ...}
+    /// Known service types from sentin8_vertical_services + platform services.
+    /// e.g. {"sentin8:auth", "sentin8:storage", "bank8:ledger", "bank8:fdx", ...}
     known_services: Arc<RwLock<HashSet<String>>>,
- /// Map from subdomain label → full service_type.
- /// e.g. {"auth" → "sentin8:auth", "func" → "sentin8:func",
- /// "bank8-ledger" → "bank8:ledger"}.
- /// Built from `sentin8_vertical_services.subdomain` at load time.
- /// Used to resolve the first hostname label to a service without
- /// ad-hoc `sentin8-` prefix prepending.
+    /// Map from subdomain label → full service_type.
+    /// e.g. {"auth" → "sentin8:auth", "func" → "sentin8:func",
+    /// "bank8-ledger" → "bank8:ledger"}.
+    /// Built from `sentin8_vertical_services.subdomain` at load time.
+    /// Used to resolve the first hostname label to a service without
+    /// ad-hoc `sentin8-` prefix prepending.
     subdomain_map: Arc<RwLock<HashMap<String, String>>>,
 }
 
@@ -166,7 +166,7 @@ impl DomainResolver {
         }
     }
 
- /// Resolve a hostname to a domain mapping.
+    /// Resolve a hostname to a domain mapping.
     /// Resolve it.
     pub fn resolve(&self, hostname: &str) -> Option<DomainMapping> {
         // 0. Platform-plane SNIs resolve STATICALLY — no cache, no sys
@@ -183,7 +183,7 @@ impl DomainResolver {
             return None;
         }
 
- // 1. Check app instance domains (exact match in apps cache).
+        // 1. Check app instance domains (exact match in apps cache).
         {
             let apps = self.apps.read();
             if let Some(app) = apps.get(hostname) {
@@ -196,7 +196,7 @@ impl DomainResolver {
                     backend_url: None,
                 });
             }
- // Check BFF hostname.
+            // Check BFF hostname.
             if let Some(app) = apps.values().find(|a| a.bff_hostname == hostname) {
                 return Some(DomainMapping {
                     hostname: hostname.to_string(),
@@ -209,13 +209,13 @@ impl DomainResolver {
             }
         }
 
- // 2. Tenant hostname shape: {service}.{env_slug}.{org_domain}? The
- // org/env caches are GONE (D7-PXY — the RLS-blind SELECTs are retired):
- // a tenant hostname's SERVICE label still resolves locally via the
- // subdomain map; org/env IDs for the mapping ride the Sys owner API
- // via sentin8-tls's HostContextResolver when the mapping needs them.
- // In the L4 SNI path only `service` drives backend picking — the
- // system constants fill the placeholder fields.
+        // 2. Tenant hostname shape: {service}.{env_slug}.{org_domain}? The
+        // org/env caches are GONE (D7-PXY — the RLS-blind SELECTs are retired):
+        // a tenant hostname's SERVICE label still resolves locally via the
+        // subdomain map; org/env IDs for the mapping ride the Sys owner API
+        // via sentin8-tls's HostContextResolver when the mapping needs them.
+        // In the L4 SNI path only `service` drives backend picking — the
+        // system constants fill the placeholder fields.
         let known_services = self.known_services.read();
         let subdomain_map = self.subdomain_map.read();
 
@@ -273,15 +273,11 @@ impl DomainResolver {
         *self.known_services.write() = known_services;
         *self.subdomain_map.write() = subdomain_map;
 
-        tracing::info!(
-            services = svc_count,
-            "domain resolver: cache loaded"
-        );
+        tracing::info!(services = svc_count, "domain resolver: cache loaded");
 
         Ok(())
     }
 }
-
 
 impl Default for DomainResolver {
     fn default() -> Self {
@@ -299,7 +295,7 @@ impl Default for DomainResolver {
 /// Spawn sync.
 pub fn spawn_sync(pool: PgPool, resolver: DomainResolver) {
     tokio::spawn(async move {
- // 1. Seed: retry until non-empty (up to 10 × 3s).
+        // 1. Seed: retry until non-empty (up to 10 × 3s).
         for attempt in 0..10u32 {
             match resolver.reload(&pool).await {
                 Ok(_) => break,
@@ -310,9 +306,9 @@ pub fn spawn_sync(pool: PgPool, resolver: DomainResolver) {
             tokio::time::sleep(std::time::Duration::from_secs(3)).await;
         }
 
- // 2. MemBus subscription (mchan pub/sub, ephemeral class) + safety
- // poll backstop. A failed subscribe keeps the poll-only mode —
- // refresh degrades to 30s, never blocks routing.
+        // 2. MemBus subscription (mchan pub/sub, ephemeral class) + safety
+        // poll backstop. A failed subscribe keeps the poll-only mode —
+        // refresh degrades to 30s, never blocks routing.
         let safety = std::time::Duration::from_secs(30);
         let cfg = sentin8::membus::MemBusConfig::from_env("sentin8:proxy");
         match sentin8::membus::MemBus::connect(cfg).await {
@@ -326,47 +322,49 @@ pub fn spawn_sync(pool: PgPool, resolver: DomainResolver) {
                             family = crate::sys_events::DOMAIN_FAMILY,
                             "domain resolver: MemBus domain-changed subscription active"
                         );
- // Reader task + safety poll.
+                        // Reader task + safety poll.
                         loop {
                             tokio::select! {
-                                frame = sub.next_frame() => {
-                                    match frame {
-                                        Ok(Some(_env)) => {
-                                            tracing::info!(
-                                                "domain resolver: domain-changed notification — reloading cache"
-                                            );
-                                            if let Err(e) = resolver.reload(&pool).await {
-                                                tracing::error!(error = ?e, "domain resolver: reload failed");
-                                            }
-                                        }
-                                        Ok(None) | Err(_) => {
-                                            tracing::warn!("domain resolver: membus subscription ended — reconnecting");
-                                            break;
-                                        }
-                                    }
-                                }
-                                _ = tokio::time::sleep(safety) => {
- // Safety poll: also catches missed
- // notifications while Valkey was down.
-                                    if let Err(e) = resolver.reload(&pool).await {
-                                        tracing::error!(error = ?e, "domain resolver: safety poll failed");
-                                    }
-                                }
-                            }
+                                                           frame = sub.next_frame() => {
+                                                               match frame {
+                                                                   Ok(Some(_env)) => {
+                                                                       tracing::info!(
+                                                                           "domain resolver: domain-changed notification — reloading cache"
+                                                                       );
+                                                                       if let Err(e) = resolver.reload(&pool).await {
+                                                                           tracing::error!(error = ?e, "domain resolver: reload failed");
+                                                                       }
+                                                                   }
+                                                                   Ok(None) | Err(_) => {
+                                                                       tracing::warn!("domain resolver: membus subscription ended — reconnecting");
+                                                                       break;
+                                                                   }
+                                                               }
+                                                           }
+                                                           _ = tokio::time::sleep(safety) => {
+                            // Safety poll: also catches missed
+                            // notifications while Valkey was down.
+                                                               if let Err(e) = resolver.reload(&pool).await {
+                                                                   tracing::error!(error = ?e, "domain resolver: safety poll failed");
+                                                               }
+                                                           }
+                                                       }
                         }
                     }
                     Err(e) => {
                         tracing::warn!(error = %e, "domain resolver: membus subscribe failed — safety poll only");
                     }
                 },
-                Err(e) => tracing::warn!(error = %e, "domain resolver: membus for_env failed — safety poll only"),
+                Err(e) => {
+                    tracing::warn!(error = %e, "domain resolver: membus for_env failed — safety poll only")
+                }
             },
             Err(e) => {
                 tracing::warn!(error = %e, "domain resolver: membus connect failed — safety poll only");
             }
         }
 
- // Safety polling loop (runs if the subscription is unavailable).
+        // Safety polling loop (runs if the subscription is unavailable).
         loop {
             tokio::time::sleep(safety).await;
             if let Err(e) = resolver.reload(&pool).await {
@@ -443,9 +441,7 @@ mod tests {
                 app_id,
             },
         )]);
-        let m = f
-            .resolve("bff-portal.prod.acme.example.com")
-            .unwrap();
+        let m = f.resolve("bff-portal.prod.acme.example.com").unwrap();
         assert_eq!(m.service, "sentin8:bff");
         assert_eq!(m.application_id, Some(app_id));
     }
@@ -463,9 +459,7 @@ mod tests {
                 app_id,
             },
         )]);
-        let m = f
-            .resolve("portal.prod.acme.example.com")
-            .unwrap();
+        let m = f.resolve("portal.prod.acme.example.com").unwrap();
         assert_eq!(m.service, "sentin8:web");
         assert_eq!(m.application_id, Some(app_id));
     }
@@ -475,9 +469,7 @@ mod tests {
         // Not in the subdomain map and not a known service type → an app
         // instance served by web.
         let f = fixture();
-        let m = f
-            .resolve("portal.prod.acme.example.com")
-            .unwrap();
+        let m = f.resolve("portal.prod.acme.example.com").unwrap();
         assert_eq!(m.service, "sentin8:web");
         assert_eq!(m.application_id, None);
     }

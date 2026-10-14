@@ -245,9 +245,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
                 };
                 let backends = backends.clone();
                 tokio::spawn(async move {
-                    if let Err(e) =
-                        handle_acme_challenge_http(&mut stream, &backends).await
-                    {
+                    if let Err(e) = handle_acme_challenge_http(&mut stream, &backends).await {
                         tracing::warn!(error = %e, "http80 challenge request failed");
                     }
                 });
@@ -731,11 +729,8 @@ async fn connect_with_failover(
     backends: &backend_registry::SharedServiceBackendRegistry,
     timeout: Duration,
 ) -> Option<tokio::net::TcpStream> {
-    if let Ok(Ok(s)) = tokio::time::timeout(
-        timeout,
-        tokio::net::TcpStream::connect(first_addr),
-    )
-    .await
+    if let Ok(Ok(s)) =
+        tokio::time::timeout(timeout, tokio::net::TcpStream::connect(first_addr)).await
     {
         return Some(s);
     }
