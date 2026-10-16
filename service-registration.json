@@ -4,7 +4,11 @@
     {
       "service_type": "sentin8:proxy",
       "subdomain": "proxy",
-      "binary": "sentin8-proxy"
+      "binary": "sentin8-proxy",
+      "telemetry_property": {
+        "slug": "proxy",
+        "name": "Sentin8:Proxy Platform Telemetry"
+      }
     }
   ]
 }
