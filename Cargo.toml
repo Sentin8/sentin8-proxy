@@ -1,0 +1,56 @@
+# SPDX-FileCopyrightText: Copyright Logically Magic Inc. <hello@logicallymagic.com>
+# SPDX-FileCopyrightText: Copyright Hamid Jahanzad <Hamid@Jahanzad.com>
+# SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
+# SPDX-License-Identifier: Apache-2.0
+
+[package]
+name = "sentin8-proxy"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Sentin8/sentin8-proxy"
+rust-version = "1.85"
+description = "Sentin8 Proxy — dual-mode L4/L7 ingress router for all services."
+
+[[bin]]
+name = "sentin8-proxy"
+path = "src/main.rs"
+
+[lib]
+name = "sentin8_proxy_server"
+path = "src/lib.rs"
+
+[dependencies]
+# THE SDK pin (RS 2.3) - the only cross-repo dependency. It carries the
+# entire shared library workspace (core/identity/tls/bus/shield/shell +
+# every proxy-client/contracts SDK crate) behind the `sentin8` facade.
+sentin8 = { git = "https://github.com/Sentin8/sentin8-sdk", tag = "sdk-v0.6.6" }
+
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1", features = ["full"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.7", features = ["trace", "cors", "compression-gzip", "limit"] }
+hyper = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls-ring", "postgres", "uuid", "chrono", "json", "macros"] }
+# Valkey GLIDE — the platform's mandated client engine (group DESIGN.md §3.1).
+valkey-glide = "0.9.0"
+dotenvy = "0.15"
+uuid = { version = "1", features = ["v4", "v5", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1"
+anyhow = "1"
+futures-util = "0.3"
+parking_lot = "0.12"
+reqwest = { version = "0.12", features = ["json", "rustls-tls-native-roots-no-provider"], default-features = false }
+hyper-util = { version = "0.1", features = ["server", "http1", "http2", "tokio"] }
+http = "1"
+tokio-rustls = "0.26"
+rustls = { version = "0.23", features = ["std", "tls12", "logging"], default-features = false }
+rustls-pemfile = "2"
+rustls-native-certs = "0.7"
+rcgen = "0.13"
+time = "0.3.36"
