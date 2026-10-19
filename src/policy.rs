@@ -5,7 +5,7 @@
 
 //! Sentin8:Policy integration for proxy (.16).
 //!
-//! Thin re-export of the shared bridge (`sentin8::shield::runtime`) — the
+//! Thin re-export of the shared bridge (`sentin8::shield::runtime`) - the
 //! consolidated implementation every service uses. The proxy's SNI/L7 data
 //! plane is transport, not authorization: tenant isolation rides the
 //! `X-Sentin8-*` context headers the upstream services enforce. The Shield

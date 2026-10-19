@@ -3,13 +3,13 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Policy engine — WAF, rate limiting, path ACLs for L7 TLS bridging mode.
+//! Policy engine - WAF, rate limiting, path ACLs for L7 TLS bridging mode.
 //!
 //! The policy pipeline runs on every external (L7) request:
-//! 1. IP reputation (placeholder — always allows in v1)
+//! 1. IP reputation (placeholder - always allows in v1)
 //! 2. Rate limiter (token bucket per client IP)
 //! 3. WAF rules (SQL injection, XSS, path traversal pattern detection)
-//! 4. Path ACL (allow/deny per path prefix — default: allow all)
+//! 4. Path ACL (allow/deny per path prefix - default: allow all)
 //! 5. Header validation (size limits, encoding checks)
 //!
 //! Design:
@@ -23,10 +23,10 @@ use std::time::Instant;
 /// Outcome of a policy evaluation.
 /// The policyoutcome type.
 pub enum PolicyOutcome {
-    /// Request is allowed — proceed to backend.
+    /// Request is allowed - proceed to backend.
     /// The allow variant.
     Allow,
-    /// Request is blocked — return this status and message to the client.
+    /// Request is blocked - return this status and message to the client.
     Block(StatusCode, &'static str),
 }
 
@@ -42,7 +42,7 @@ pub struct PolicyConfig {
     pub rate_limit_rps: u32,
 }
 
-/// The policy engine — holds rate limiter state and WAF rule configuration.
+/// The policy engine - holds rate limiter state and WAF rule configuration.
 /// The policyengine type.
 pub struct PolicyEngine {
     config: PolicyConfig,
@@ -72,14 +72,14 @@ impl PolicyEngine {
         headers: &HeaderMap,
         body: &[u8],
     ) -> PolicyOutcome {
-        // 1. Rate limiting — keyed `(client_ip, host)` (PROXY-3, proxy README
+        // 1. Rate limiting - keyed `(client_ip, host)` (PROXY-3, proxy README
         // §7): the SNI/Host pair is the tenant identity at the L7 bridge, so a
         // burst against one app must not exhaust every other host's budget.
         if self.config.rate_limit_enabled && !self.rate_limiter.check(client_ip, host) {
             tracing::warn!(
                 %client_ip,
                 host = %host,
-                "proxy: rate limit exceeded — blocking request"
+                "proxy: rate limit exceeded - blocking request"
             );
             return PolicyOutcome::Block(StatusCode::TOO_MANY_REQUESTS, "rate limit exceeded");
         }
@@ -91,14 +91,14 @@ impl PolicyEngine {
                     %client_ip,
                     detection = %detection,
                     uri = %uri,
-                    "proxy: WAF rule triggered — blocking request"
+                    "proxy: WAF rule triggered - blocking request"
                 );
                 return PolicyOutcome::Block(StatusCode::FORBIDDEN, "request blocked by WAF");
             }
         }
 
-        // 3. Path ACL — default: allow all (per-tenant config in future)
-        // 4. Header validation — basic size checks
+        // 3. Path ACL - default: allow all (per-tenant config in future)
+        // 4. Header validation - basic size checks
         if headers.len() > 100 {
             return PolicyOutcome::Block(
                 StatusCode::REQUEST_HEADER_FIELDS_TOO_LARGE,
@@ -115,7 +115,7 @@ impl PolicyEngine {
 /// Simple in-memory token-bucket rate limiter per `(client IP, host)`.
 ///
 /// Each (IP, host) pair gets a bucket that refills at `rps` tokens/second
-/// up to `rps` capacity. No Valkey dependency for the hot path — counters
+/// up to `rps` capacity. No Valkey dependency for the hot path - counters
 /// are in-memory.
 struct RateLimiter {
     rps: u32,

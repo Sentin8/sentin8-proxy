@@ -7,12 +7,12 @@
 //!
 //! The proxy describes itself to `vertical enroll` via `--print-registration`.
 //! Its M2M grants declare the workload identities it registers:
-//! - `sentin8:proxy` — future direct-produce workloads (bus produce scope).
-//! - `sentin8:proxy-policy` — the Shield hot-reload consumer
+//! - `sentin8:proxy` - future direct-produce workloads (bus produce scope).
+//! - `sentin8:proxy-policy` - the Shield hot-reload consumer
 //!   (`policy_bus_client("sentin8:proxy")` → `{service}-policy`) AND the
 //!   Shield decision stat emitter (`boot_full` →
 //!   `init_stat_emitter_for_service` → `{short}-policy`, scope
-//!   `sentin8:stat:measure` — same workload, two consumers, hence both
+//!   `sentin8:stat:measure` - same workload, two consumers, hence both
 //!   scopes).
 
 use sentin8::registration::{AdminScope, CrossSchemaGrant, M2mGrant, PgRole, Registration};
@@ -26,21 +26,21 @@ const M2M_GRANTS: &[M2mGrant] = &[
         workload: "sentin8:proxy-policy",
         scopes: &["sentin8:bus:consume", "sentin8:stat:measure"],
     },
-    // TLS-RLS-4 (design/sentin8-vertical-data-plane-contract.md §VDC.7): the database-free HostContextResolver’s resolve workload — cache miss calls Sys `GET /v1/resolve/hostname`.
+    // TLS-RLS-4 (design/sentin8-vertical-data-plane-contract.md §VDC.7): the database-free HostContextResolver’s resolve workload - cache miss calls Sys `GET /v1/resolve/hostname`.
     M2mGrant {
         workload: "sentin8-proxy-tls",
         scopes: &["sentin8:sys:instances:read"],
     },
 ];
 
-/// The OpenAPI spec closure — the proxy carries no utoipa spec (its surface
+/// The OpenAPI spec closure - the proxy carries no utoipa spec (its surface
 /// is the SNI/L7 routing, not CLI-derivable commands), so the closure emits
 /// `null` (the enroll path skips empty openapi output).
 fn openapi_spec() -> serde_json::Value {
     serde_json::Value::Null
 }
 
-// Declared cross-schema reads (architecture-principles §6.6a — explicit,
+// Declared cross-schema reads (architecture-principles §6.6a - explicit,
 // never blanket): `domain_resolver.rs` resolves hostnames from the platform
 // org/env rows + app instances on cache-miss (crates-tls HostContextResolver
 // fallback). SELECT-only; the proxy holds no cross-schema writes.
@@ -50,12 +50,12 @@ const PG_ROLES: &[PgRole] = &[PgRole {
     bypass_rls: false,
     database: "sentin8",
     cross_schema_grants: &[
-        // D7-PXY: the orgs/envs/app_instances SELECTs are RETIRED —
+        // D7-PXY: the orgs/envs/app_instances SELECTs are RETIRED -
         // platform SNIs resolve statically, tenant SNIs ride Sys's owner
         // API (`GET /v1/resolve/hostname`, `sentin8-proxy-tls` workload).
         // The subdomain→service map is read on every domain-event reload +
         // 30s poll (crates/config `load_subdomain_map`) and by the embedded
-        // TLS context resolver (`resolve_service_name_in_tx`) — PROXY-2,
+        // TLS context resolver (`resolve_service_name_in_tx`) - PROXY-2,
         // proxy DESIGN §3.
         CrossSchemaGrant {
             schema: "sys",

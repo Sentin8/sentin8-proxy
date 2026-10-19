@@ -8,7 +8,7 @@
 //! The L7 bridge previously opened a fresh `upstream_tls::connect()` per
 //! proxied request, paying a full post-quantum TLS handshake
 //! (X25519MLKEM768 + ML-DSA-65, ~40 ms loopback) on EVERY external
-//! request — the dashboard latency metric showed the handshake cost, not
+//! request - the dashboard latency metric showed the handshake cost, not
 //! request cost. The pool keeps warmed upstream connections per
 //! `(backend_addr, sni_hostname)` and hands them out before a fresh
 //! connect is attempted.
@@ -16,7 +16,7 @@
 //! ## One connection = one request (handoff-warm, no pipelining)
 //!
 //! The L7 pipe closes the upstream after the response completes
-//! (HTTP/1.0-style connection-per-request byte piping) — a pooled
+//! (HTTP/1.0-style connection-per-request byte piping) - a pooled
 //! connection is taken, used for exactly one request/response cycle, and
 //! the pool is refilled by fresh connects as requests need them. The
 //! pool therefore never pipelines a second request onto a busy socket
@@ -30,14 +30,14 @@
 //! pooled sockets that fail on first write/read. The caller handles that
 //! with retry-once-on-fresh-connection semantics (mirroring the captain
 //! health-probe retry, captain DESIGN §5): a stale send must not surface
-//! as repeated 502s, and a failed take is discarded — never re-pooled.
+//! as repeated 502s, and a failed take is discarded - never re-pooled.
 //!
 //! ## Eviction
 //!
 //! A background task evicts idle entries past [`IDLE_TIMEOUT`] and caps
 //! the pool per backend at [`MAX_PER_BACKEND`] so a burst cannot
 //! unboundedly hoard sockets. The pool itself holds only established,
-//! healthy sockets — a connect failure never inserts.
+//! healthy sockets - a connect failure never inserts.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -51,7 +51,7 @@ use crate::upstream_tls::{self, UpstreamConnection, UpstreamTlsConfig};
 const IDLE_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Maximum idle connections retained per `(addr, sni)` key. The L7 path
-/// is connection-per-request, so a small warm buffer (1) is sufficient —
+/// is connection-per-request, so a small warm buffer (1) is sufficient -
 /// additional concurrent requests open fresh connects and immediately
 /// hand off.
 const MAX_PER_BACKEND: usize = 1;
@@ -62,7 +62,7 @@ struct PoolEntry {
     idle_since: Instant,
 }
 
-/// Shared handle to the idle pool — cheap to clone.
+/// Shared handle to the idle pool - cheap to clone.
 #[derive(Clone)]
 pub struct UpstreamPool {
     inner: Arc<UpstreamPoolInner>,
@@ -85,7 +85,7 @@ impl UpstreamPool {
     }
 
     /// Take a warm connection for `(backend_addr, sni_hostname)` if one
-    /// is pooled. Returns `None` when the pool is empty for the key —
+    /// is pooled. Returns `None` when the pool is empty for the key -
     /// the caller then connects fresh.
     pub fn take(&self, backend_addr: &str, sni_hostname: &str) -> Option<UpstreamConnection> {
         let key = (backend_addr.to_string(), sni_hostname.to_string());
@@ -97,9 +97,9 @@ impl UpstreamPool {
     }
 
     /// Put a healthy upstream connection back for reuse (HTTP/1.1
-    /// keep-alive cycle completed — PROXY-5). Called by the L7 pipe when
+    /// keep-alive cycle completed - PROXY-5). Called by the L7 pipe when
     /// the response was fully framed; a close-delimited or failed pipe
-    /// discards the connection instead (stale/garbage state —
+    /// discards the connection instead (stale/garbage state -
     /// never re-pooled).
     pub fn put(&self, backend_addr: &str, sni_hostname: &str, conn: UpstreamConnection) {
         let key = (backend_addr.to_string(), sni_hostname.to_string());
@@ -115,11 +115,11 @@ impl UpstreamPool {
                 },
             );
         }
-        // Lock poisoning or cap-full: the connection is dropped —
+        // Lock poisoning or cap-full: the connection is dropped -
         // the next request connects fresh (always safe).
     }
 
-    /// Number of pooled connections (observability — mgmt health payload).
+    /// Number of pooled connections (observability - mgmt health payload).
     // Observability-only counter: emptiness is not a pool state the code
     // branches on (eviction/pruning decide), so no paired is_empty ships.
     #[allow(clippy::len_without_is_empty)]
@@ -143,7 +143,7 @@ impl Default for UpstreamPool {
     }
 }
 
-/// Spawn the eviction loop — prunes idle entries every [`IDLE_TIMEOUT`].
+/// Spawn the eviction loop - prunes idle entries every [`IDLE_TIMEOUT`].
 pub fn spawn_evictor(pool: UpstreamPool) {
     tokio::spawn(async move {
         loop {
@@ -158,14 +158,14 @@ pub fn spawn_evictor(pool: UpstreamPool) {
 ///
 /// Returns `(connection, established_fresh)`. `established_fresh` is
 /// true when no pooled connection was available and a new TCP(+PQ TLS)
-/// connection was created — the caller records it as a cold-path metric.
+/// connection was created - the caller records it as a cold-path metric.
 /// The caller is responsible for the connection's end state:
 ///
 /// - response fully framed (Content-Length / chunked) →
 ///   [`UpstreamPool::put`] returns the connection for the NEXT request
-///   (HTTP/1.1 keep-alive reuse — the target state);
+///   (HTTP/1.1 keep-alive reuse - the target state);
 /// - close-delimited response (no length, HTTP/1.0) or any mid-pipe
-///   transport failure → the connection is dead — discard it.
+///   transport failure → the connection is dead - discard it.
 pub async fn acquire(
     pool: &UpstreamPool,
     backend_addr: &str,

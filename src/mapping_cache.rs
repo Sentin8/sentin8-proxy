@@ -5,7 +5,7 @@
 
 //! Read-only in-memory cache for domain mappings.
 //!
-//! The cache is always empty — all domain resolution is done by the
+//! The cache is always empty - all domain resolution is done by the
 //! `DomainResolver` which constructs mappings on the fly from
 //! `sentin8_sys_organizations`, `sentin8_sys_environments`, and
 //! `sentin8_sys_app_instances`.

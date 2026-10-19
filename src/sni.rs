@@ -3,10 +3,10 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! SNI peeking — extract the SNI hostname from the plaintext TLS ClientHello.
+//! SNI peeking - extract the SNI hostname from the plaintext TLS ClientHello.
 //!
 //! The TLS `ClientHello` is the first record of a TLS handshake and is
-//! **not encrypted** — it contains the `server_name` extension (SNI) in
+//! **not encrypted** - it contains the `server_name` extension (SNI) in
 //! plaintext. Prox reads just enough of the first record to extract the
 //! SNI hostname, then pipes the entire stream (including the already-read
 //! bytes) verbatim to the target.
@@ -307,7 +307,7 @@ mod tests {
 
     #[test]
     fn sni_truncated_host_name_returns_none() {
-        // Record cut 17 bytes short — inside the host_name bytes: the length
+        // Record cut 17 bytes short - inside the host_name bytes: the length
         // field promises more than the buffer holds → Ok(None).
         let full = client_hello_record(&[(0x0000, sni_extension(&["auth.ops.sys.sentin8.local"]))]);
         assert_eq!(

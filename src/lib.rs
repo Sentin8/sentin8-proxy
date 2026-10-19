@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Sentin8 Proxy — the single ingress: L4 SNI router + L7 bridge.
+//! Sentin8 Proxy - the single ingress: L4 SNI router + L7 bridge.
 
 #![deny(missing_docs)]
 
@@ -25,7 +25,7 @@ pub mod l7_metrics;
 pub mod mapping_cache;
 /// Raw TCP pipe (L4 passthrough).
 pub mod pipe;
-/// Shield (Sentin8:Policy) integration — shared bridge re-exports.
+/// Shield (Sentin8:Policy) integration - shared bridge re-exports.
 pub mod policy;
 /// Route-path policy enforcement (L7).
 pub mod policy_engine;

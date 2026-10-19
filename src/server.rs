@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Proxy server — dual-mode L4/L7 ingress router on port 443 + management API.
+//! Proxy server - dual-mode L4/L7 ingress router on port 443 + management API.
 //!
 //! Startup flow:
 //!
@@ -12,7 +12,7 @@
 //! 2. Spawn the Valkey pub/sub backend refresh loop (per-service instance
 //!    lists).
 //! 3. If L7 is enabled, build the sentin8-tls cert resolver + TLS acceptor.
-//! 4. Bind TCP on port 443 — accept loop spawns a task per connection.
+//! 4. Bind TCP on port 443 - accept loop spawns a task per connection.
 //!    Each task: check source IP → internal: L4 passthrough, external: L7
 //!    bridging.
 //! 5. If internal_port > 0, bind a second listener for guaranteed L4
@@ -43,9 +43,9 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
     // ── 0. Valkey-plane workload identity ──────────────────────────────
     // The proxy's cert-CN identity (sentin8:proxy) resolves the backend
     // registry, the conn-flush metrics channel, and L7 metrics. A fresh
-    // platform has no persisted pair yet — mint-or-load in a background
+    // platform has no persisted pair yet - mint-or-load in a background
     // loop (the mint races Acme's own boot; retry until the pair lands,
-    // then the registry refresh heals on its next cycle — group DESIGN.md
+    // then the registry refresh heals on its next cycle - group DESIGN.md
     // §3.1).
     {
         let issuer = sentin8::config::Sentin8Config::from_env().sentin8_auth_issuer();
@@ -63,7 +63,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
                     Err(e) => {
                         tracing::warn!(
                             error = %e,
-                            "proxy: Valkey workload identity mint pending — retrying in 10s"
+                            "proxy: Valkey workload identity mint pending - retrying in 10s"
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
                     }
@@ -91,9 +91,9 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
     // ── 3. Management API (separate port) ────────────────────────────
     let mgmt_addr = format!("0.0.0.0:{}", config.mgmt_port);
 
-    // ── Sentin8:Policy (— boot_full): proxy is a custom-boot
+    // ── Sentin8:Policy (- boot_full): proxy is a custom-boot
     // binary (L4/L7 router, no shell serve), so it runs the ONE shared boot
-    // helper itself — same four steps the shell runs for every other
+    // helper itself - same four steps the shell runs for every other
     // service. No second engine may be constructed.
     let policy_engine = sentin8::shield::runtime::engine_for("sentin8:proxy");
     sentin8::shield::runtime::boot_full(
@@ -104,7 +104,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
     )
     .await?;
 
-    // In-flight L7 connection gauge (proxy README §7) — created here so both the
+    // In-flight L7 connection gauge (proxy README §7) - created here so both the
     // data plane (handle_l7_connection, via L7State) and the management
     // health payload (AppState → handlers::health) share one counter.
     let connection_gauge = std::sync::Arc::new(crate::tls_proxy::L7ConnectionGauge::new());
@@ -178,7 +178,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
                 .put(sentin8::shield::admin::put_attribute::<handlers::AppState>)
                 .delete(sentin8::shield::admin::delete_attribute::<handlers::AppState>),
         )
-        // ── Policy Studio — RFW renderer aliases ──
+        // ── Policy Studio - RFW renderer aliases ──
         .route(
             "/v1/admin/policy-sets",
             post(sentin8::shield::admin::create_policy_set::<handlers::AppState>),
@@ -222,7 +222,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
 
     // ── 3b. Optional plain-HTTP challenge listener (:80, DEVDOM-2,
     // acme DESIGN §4.3). Upstream ACME CAs validate HTTP-01 by fetching
-    // http://{domain}/.well-known/acme-challenge/{token} on port 80 —
+    // http://{domain}/.well-known/acme-challenge/{token} on port 80 -
     // this listener forwards those GETs to acme and 404s everything
     // else. Unset = not bound (external issuance disabled).
     if config.http_challenge_port > 0 {
@@ -253,7 +253,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
         });
     }
 
-    // ── 4. Connection counter — counts routed TLS connections ─────────
+    // ── 4. Connection counter - counts routed TLS connections ─────────
     let conn_counter = ConnectionCounter::new();
     spawn_conn_flush_loop(conn_counter.clone(), config.valkey_url.clone(), 10);
 
@@ -270,7 +270,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
             .await,
         )
     } else {
-        tracing::info!("proxy: L7 TLS bridging disabled — all traffic gets L4 passthrough");
+        tracing::info!("proxy: L7 TLS bridging disabled - all traffic gets L4 passthrough");
         None
     };
 
@@ -324,7 +324,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
             } else if let Some(ref l7) = l7_state {
                 handle_l7_connection(client_stream, client_addr, l7.clone()).await;
             } else {
-                // L7 disabled — fall back to L4 for external traffic too.
+                // L7 disabled - fall back to L4 for external traffic too.
                 handle_l4_passthrough(
                     client_stream,
                     client_addr,
@@ -367,7 +367,7 @@ async fn build_l7_state(
     .expect("proxy: failed to generate bootstrap cert");
 
     // Build the sentin8-tls cert resolver for edge TLS termination.
-    // The proxy uses the same sentin8-tls library as backends — it's
+    // The proxy uses the same sentin8-tls library as backends - it's
     // just another consumer that obtains certs from Acme. The bootstrap
     // cert is pre-loaded so TLS works before Acme is reachable.
     let tls = sentin8::tls::Sentin8Tls::builder()
@@ -437,11 +437,11 @@ async fn handle_l4_passthrough(
     let sni_hostname = match sni::peek_sni(&client_stream).await {
         Ok(Some(sni)) => sni,
         Ok(None) => {
-            tracing::debug!(%client_addr, "no SNI in ClientHello — closing connection");
+            tracing::debug!(%client_addr, "no SNI in ClientHello - closing connection");
             return;
         }
         Err(e) => {
-            tracing::debug!(%client_addr, error = %e, "failed to peek SNI — closing connection");
+            tracing::debug!(%client_addr, error = %e, "failed to peek SNI - closing connection");
             return;
         }
     };
@@ -458,7 +458,7 @@ async fn handle_l4_passthrough(
                     Arc::new(m)
                 }
                 None => {
-                    tracing::warn!(%client_addr, sni = %sni_hostname, "no mapping for SNI (cache miss + resolver miss) — closing connection");
+                    tracing::warn!(%client_addr, sni = %sni_hostname, "no mapping for SNI (cache miss + resolver miss) - closing connection");
                     return;
                 }
             }
@@ -479,14 +479,14 @@ async fn handle_l4_passthrough(
     // If the mapping has a backend_url (app instance), forward directly.
     // Otherwise, pick an Active instance of the target service from Valkey.
     let backend_addr = if let Some(ref url) = mapping.backend_url {
-        // App instance — direct to backend_url (strip http:// or https:// prefix).
+        // App instance - direct to backend_url (strip http:// or https:// prefix).
         url.replace("http://", "").replace("https://", "")
     } else {
         // The domain resolver already resolves the subdomain label to the
         // full service_type (e.g. `auth` → `sentin8-auth`) via the
         // `subdomain_map` loaded from `sentin8_vertical_services`. So
         // `mapping.service` is always the full service_type that captain
-        // registered — no `sentin8-` prefix prepending needed here.
+        // registered - no `sentin8-` prefix prepending needed here.
         match backends.pick(&mapping.service) {
             Some(addr) => addr,
             None => {
@@ -494,7 +494,7 @@ async fn handle_l4_passthrough(
                     %client_addr,
                     sni = %sni_hostname,
                     service = %mapping.service,
-                    "no Active instances for service — closing connection"
+                    "no Active instances for service - closing connection"
                 );
                 return;
             }
@@ -514,7 +514,7 @@ async fn handle_l4_passthrough(
                     sni = %sni_hostname,
                     service = %mapping.service,
                     backend = %backend_addr,
-                    "all instances failed — closing connection"
+                    "all instances failed - closing connection"
                 );
                 return;
             }
@@ -528,10 +528,10 @@ async fn handle_l4_passthrough(
 /// Serve ONE plain-HTTP request on the :80 challenge listener
 /// (DEVDOM-2, acme DESIGN §4.3): `GET /.well-known/acme-challenge/{token}`
 /// is forwarded to an Active acme instance over TLS (the same
-/// cert-resolved HTTPS surface acme always serves — IP pinned to the
+/// cert-resolved HTTPS surface acme always serves - IP pinned to the
 /// picked instance, SNI set to acme's platform hostname, the pattern
 /// sentin8-tls's ACME client uses); every other request gets a fixed
-/// 404. Requests are unauthenticated by design (RFC 8555 §8.1 — the
+/// 404. Requests are unauthenticated by design (RFC 8555 §8.1 - the
 /// token itself is the capability).
 async fn handle_acme_challenge_http(
     stream: &mut tokio::net::TcpStream,
@@ -539,7 +539,7 @@ async fn handle_acme_challenge_http(
 ) -> anyhow::Result<()> {
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-    // Read the request head (bounded — a malformed client cannot push
+    // Read the request head (bounded - a malformed client cannot push
     // unbounded bytes into the proxy).
     let mut buf = vec![0u8; 8192];
     let mut head = Vec::new();
@@ -582,7 +582,7 @@ async fn forward_challenge_to_acme(
     backends: &crate::backend_registry::ServiceBackendRegistry,
 ) -> anyhow::Result<String> {
     // Local, order-independent path check: the listener serves ONLY the
-    // well-known challenge path — everything else is a fixed 404.
+    // well-known challenge path - everything else is a fixed 404.
     let path = target.split('?').next().unwrap_or(target);
     if method != "GET" || !path.starts_with("/.well-known/acme-challenge/") {
         return Ok(
@@ -665,7 +665,7 @@ impl ConnectionCounter {
 
 /// Spawn a flush loop that publishes the proxy's total connection count to
 /// Valkey pub/sub channel `stat:metrics:tls` every `flush_interval_s`
-/// seconds. The proxy only reports its own connection count — per-service
+/// seconds. The proxy only reports its own connection count - per-service
 /// API call counts are reported by each service's own `traffic_counter`
 /// middleware.
 fn spawn_conn_flush_loop(counter: ConnectionCounter, valkey_url: String, flush_interval_s: u64) {
@@ -698,7 +698,7 @@ fn spawn_conn_flush_loop(counter: ConnectionCounter, valkey_url: String, flush_i
 
             // Only publish the proxy's own total connection count.
             // Per-service API call counts are reported by each service's
-            // own traffic_counter middleware — the proxy does not
+            // own traffic_counter middleware - the proxy does not
             // overwrite them.
             let payload = serde_json::json!({
                 "ts": ts,

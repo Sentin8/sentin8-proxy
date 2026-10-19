@@ -1,4 +1,4 @@
-# Design Doc: Sentin8:Proxy — Single Ingress (L4 SNI Router + L7 Bridge)
+# Design Doc: Sentin8:Proxy - Single Ingress (L4 SNI Router + L7 Bridge)
 
 ## 1. Summary
 
@@ -11,7 +11,7 @@ headers (stripping client-supplied copies), resolves domains via the
 membus → bus → owner-API chain, exposes the Shield route-path
 policy engine for L7 control, and (optionally) binds a plain-HTTP
 `:80` listener whose only purpose is forwarding
-`/.well-known/acme-challenge/*` to acme — the ingress path for
+`/.well-known/acme-challenge/*` to acme - the ingress path for
 upstream CA HTTP-01 validation (acme DESIGN §4.3).
 
 ## 2. Motivation
@@ -26,10 +26,10 @@ upstream CA HTTP-01 validation (acme DESIGN §4.3).
   per-service certs from Acme). Proxy never sees application plaintext.
 - **Context headers are authoritative.** Backends read `X-Sentin8-*`
   for tenant resolution; Proxy injects them from the SNI identity and
-  strips client-supplied copies — no header spoofing.
+  strips client-supplied copies - no header spoofing.
 - **Domain data must be live.** Service DNS names (created/updated via
   sys) resolve through membus state refreshes, bus events, and owner
-  API fallback — a 30s safety poll is the outage backstop.
+  API fallback - a 30s safety poll is the outage backstop.
 
 ## 3. Architecture & High-Level Design
 
@@ -54,62 +54,62 @@ graph TD
     end
 ```
 
-- **L4 path** — SNI-parsed ClientHello → backend registry lookup → raw
+- **L4 path** - SNI-parsed ClientHello → backend registry lookup → raw
   TCP pipe; the backend presents its own certificate (per-service,
   Acme-issued) and does its own tenant resolution from the injected
   headers.
-- **L7 path** — management-plane routes (health, stats) terminate at
+- **L7 path** - management-plane routes (health, stats) terminate at
   the proxy itself; the route-path policy engine (Shield-evaluated)
   can block requests before handlers.
-- **Bootstrap certificate** — the proxy self-issues a short-lived
+- **Bootstrap certificate** - the proxy self-issues a short-lived
   certificate for its own hostname at boot (chicken-and-egg breaker,
   same as every service).
-- **Upstream TLS** — service-to-service connections use the shared PQ
+- **Upstream TLS** - service-to-service connections use the shared PQ
   TLS stack (X25519MLKEM768, ML-DSA-65; no classical fallback).
-- **Upstream connection pooling (L7)** — L7 upstream sessions are
+- **Upstream connection pooling (L7)** - L7 upstream sessions are
   pooled per (backend, SNI) and reused across requests (PROXY-5): a
   warm pooled connection removes the ~40 ms PQ handshake from proxied
   requests; a stale pooled connection (backend respawned) fails the
   request write once and the request retries on a fresh connection.
-- **Traffic split** — IPv4/IPv6 handling with local/private address
+- **Traffic split** - IPv4/IPv6 handling with local/private address
   detection for backend selection.
 
 ## 4. Key Traits and Data Structures
 
-- **`BackendRegistry`** — the Valkey-backed map of service →
+- **`BackendRegistry`** - the Valkey-backed map of service →
   instances (ip:port, status); only `Active` instances receive
   traffic; round-robin selection per service.
-- **`DomainResolver`** — resolves hostname → backend using the
+- **`DomainResolver`** - resolves hostname → backend using the
   membus-first chain; caches in `mapping_cache` with invalidation on
   domain-changed notifications. Its `sys.*` reads
   (`organizations`, `environments`, `app_instances`,
   `vertical_services`) are declared `SELECT` grants in
-  `registration.rs` (`cross_schema_grants`) — the subdomain map rides
+  `registration.rs` (`cross_schema_grants`) - the subdomain map rides
   `sys.vertical_services`, the deduction rows ride the lifecycle tables.
-- **`Sni`** — ClientHello parser extracting the SNI extension without
+- **`Sni`** - ClientHello parser extracting the SNI extension without
   full TLS termination.
-- **`HeaderInjector`** — injects `X-Sentin8-Env-Id` / `X-Sentin8-App-Id`
+- **`HeaderInjector`** - injects `X-Sentin8-Env-Id` / `X-Sentin8-App-Id`
   / org context headers and strips client-supplied copies (the
   platform's anti-spoofing boundary).
-- **`L7Metrics` / `L7MetricsSnapshot`** — per-(service, status) request
+- **`L7Metrics` / `L7MetricsSnapshot`** - per-(service, status) request
   counts, latency aggregates, handshake errors, policy blocks, and the
   upstream warm/cold/stale-retry counters (PROXY-5 pool health).
-- **`UpstreamPool`** — the idle upstream-connection pool (PROXY-5):
+- **`UpstreamPool`** - the idle upstream-connection pool (PROXY-5):
   per-(backend_addr, sni) warmed TLS/TCP sessions handed out before a
   fresh connect; one pooled connection serves one request (no
   pipelining); 30s idle eviction + a 1-connection-per-backend cap.
-- **`L7ConnectionGauge` / `L7ConnectionGuard`** — the in-flight L7
+- **`L7ConnectionGauge` / `L7ConnectionGuard`** - the in-flight L7
   connection gauge (`AtomicUsize`, relaxed ordering): incremented at
   `handle_l7_connection` entry, decremented by the RAII guard on every
   exit path. Exposed as `active_connections` in the management health
-  payload — the drain signal captain polls during rolling upgrades.
-- **`PolicyEngine`** — route-path allow/deny rules evaluated per L7
+  payload - the drain signal captain polls during rolling upgrades.
+- **`PolicyEngine`** - route-path allow/deny rules evaluated per L7
   request (Shield-gated admin surface to manage them).
 
 ## 5. Rationale, Trade-offs, and Alternatives
 
 - **SNI passthrough (L4) for application traffic.** The backend
-  terminates TLS in-process with its own certificate — the service
+  terminates TLS in-process with its own certificate - the service
   knows its own identity, holds its own key, and injects context
   headers itself. A terminating proxy would centralize all
   application keys in Proxy (a single compromise domain) and add a
@@ -119,7 +119,7 @@ graph TD
   body handling); application traffic stays L4. A full L7 proxy for
   everything would couple Proxy to every upstream protocol.
 - **Header injection at the edge.** Proxy strips client-supplied
-  `X-Sentin8-*` copies and injects authoritative ones — backends never
+  `X-Sentin8-*` copies and injects authoritative ones - backends never
   do hostname-based tenant resolution. This is the single enforcement
   point; per-service stripping would be N places to forget.
 - **Domain resolution order: membus → bus → owner API.** The access
@@ -140,20 +140,20 @@ graph TD
 - **Idempotent single-request pool vs connection multiplexing.** The
   L7 pipe is connection-per-request (HTTP/1.0-style byte piping); the
   pool therefore hands off a WARM session without pipelining a second
-  request onto a busy socket — correctness (no cross-request
+  request onto a busy socket - correctness (no cross-request
   interleaving) for the price of one warm buffer per backend.
 - **Rejected: nginx/envoy as ingress.** The proxy is PQ-TLS-native
   (X25519MLKEM768 + ML-DSA-65, no classical fallback) and shares the
   platform's header/context semantics; an external proxy would need a
   custom TLS stack patch or a downgrade.
 - **Rejected: terminating L7 proxy for all traffic.** See L4 rationale
-  — keys and plaintext at the edge is the attack surface the design
+  - keys and plaintext at the edge is the attack surface the design
   avoids.
 
 ## 6. Internal Implementation & Invariants (Private Design)
 
 - **Invariants:**
-  - Proxy is the ONLY ingress — no service binds a public port;
+  - Proxy is the ONLY ingress - no service binds a public port;
     SNI is the routing key.
   - Client-supplied `X-Sentin8-*` headers are ALWAYS stripped before
     forwarding; only Proxy-injected context survives.
@@ -161,7 +161,7 @@ graph TD
     instances finish in-flight connections and are excluded from
     new picks.
   - Post-quantum TLS exclusively: X25519MLKEM768 key exchange, ML-DSA-65
-    signatures, SLH-DSA root CA — no classical fallback, ever.
+    signatures, SLH-DSA root CA - no classical fallback, ever.
   - ACME challenge passthrough is handled before registry lookup (the
     challenge target may not be a registered backend yet).
   - The optional `:80` plain-HTTP listener (`SENTIN8_PROXY_HTTP_PORT`)
@@ -177,7 +177,7 @@ graph TD
   Shield boot (one engine, shared with the policy-admin API) →
   listeners (public TLS + management + optional :80 challenge).
 - **Pipe.** The L4 path is a bidirectional copy loop after handshake
-  classification; no per-byte inspection — throughput is memory-copy
+  classification; no per-byte inspection - throughput is memory-copy
   bound.
 
 ## 7. Unresolved Questions / Future Designs

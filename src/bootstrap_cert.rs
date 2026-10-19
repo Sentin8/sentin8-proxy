@@ -3,15 +3,15 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Bootstrap certificate — self-issued leaf cert for the proxy's own hostname.
+//! Bootstrap certificate - self-issued leaf cert for the proxy's own hostname.
 //!
-//! Sentin8:Proxy serves HTTPS on port 443, but Sentin8:Acme — the CA that
-//! issues its certificate — is itself behind Sentin8:Proxy. To break this
+//! Sentin8:Proxy serves HTTPS on port 443, but Sentin8:Acme - the CA that
+//! issues its certificate - is itself behind Sentin8:Proxy. To break this
 //! chicken-and-egg problem, the proxy self-issues a bootstrap leaf
 //! certificate at startup using `rcgen` (same pattern as acme's
 //! bootstrap cert, .
 //!
-//! The bootstrap cert is valid for 24 hours — more than enough for Acme
+//! The bootstrap cert is valid for 24 hours - more than enough for Acme
 //! to come up and issue a proper cert. It includes the local IP in the
 //! SAN list so internal ServiceDiscovery connections work during the
 //! bootstrap window.
@@ -40,7 +40,7 @@ pub struct BootstrapCert {
 /// - The proxy hostname as the CN and primary SAN (e.g. `proxy.ops.sys.sentin8.local`)
 /// - The local IP as an additional SAN (from `SENTIN8_CAPTAIN_LOCAL_IP`)
 ///
-/// The cert is self-signed (no CA hierarchy) — it is only used to bootstrap
+/// The cert is self-signed (no CA hierarchy) - it is only used to bootstrap
 /// TLS until Acme issues a proper cert. Once Acme is healthy, the cert
 /// resolver hot-swaps to the Acme-issued cert.
 /// Generate bootstrap cert.
@@ -75,7 +75,7 @@ pub fn generate_bootstrap_cert(
     params.not_before = now;
     params.not_after = now + time::Duration::seconds(validity_secs as i64);
 
-    // Self-sign (no CA — this is a bootstrap cert, not a CA-issued cert).
+    // Self-sign (no CA - this is a bootstrap cert, not a CA-issued cert).
     let cert = params
         .self_signed(&key)
         .map_err(|e| format!("self-sign bootstrap cert: {e}"))?;

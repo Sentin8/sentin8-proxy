@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Source IP detection — determines whether a connection is internal or external.
+//! Source IP detection - determines whether a connection is internal or external.
 //!
 //! Internal connections (loopback, private, link-local) get L4 SNI passthrough.
 //! External connections (public IPs) get L7 TLS bridging (when enabled).
@@ -14,8 +14,8 @@ use std::net::IpAddr;
 
 /// Returns `true` if the source IP is internal (loopback, private, or link-local).
 ///
-/// Internal IPs get L4 SNI passthrough — no TLS termination, no HTTP inspection.
-/// External IPs get L7 TLS bridging — terminate TLS, inspect HTTP, enforce policies.
+/// Internal IPs get L4 SNI passthrough - no TLS termination, no HTTP inspection.
+/// External IPs get L7 TLS bridging - terminate TLS, inspect HTTP, enforce policies.
 pub fn is_internal_ip(addr: &IpAddr) -> bool {
     match addr {
         IpAddr::V4(v4) => {

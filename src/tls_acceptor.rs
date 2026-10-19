@@ -3,11 +3,11 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! TLS termination at the edge — wraps `sentin8-tls` for the proxy's L7 mode.
+//! TLS termination at the edge - wraps `sentin8-tls` for the proxy's L7 mode.
 //!
 //! The proxy uses the same `sentin8-tls` library as backends for TLS
 //! termination, Acme certificate management, and PQ crypto. The proxy
-//! is just another `sentin8-tls` consumer — it obtains certificates from
+//! is just another `sentin8-tls` consumer - it obtains certificates from
 //! Sentin8:Acme for all domains in the `sentin8_domains` cache.
 //!
 //! Design:

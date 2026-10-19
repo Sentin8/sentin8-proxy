@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Bidirectional TCP pipe — copies bytes between client and backend
+//! Bidirectional TCP pipe - copies bytes between client and backend
 //! in both directions until either side closes.
 
 use tokio::io::AsyncWriteExt;
@@ -13,7 +13,7 @@ use tokio::net::TcpStream;
 ///
 /// Uses `tokio::io::copy` in both directions via `tokio::join!`. When
 /// either direction completes (EOF or error), both halves are shut down.
-/// No timeout — long-lived connections (SSE, WebSocket) are supported.
+/// No timeout - long-lived connections (SSE, WebSocket) are supported.
 pub async fn pipe_bidirectional(mut client: TcpStream, mut backend: TcpStream) {
     let (mut client_rd, mut client_wr) = client.split();
     let (mut backend_rd, mut backend_wr) = backend.split();

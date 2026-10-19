@@ -3,15 +3,15 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Sentin8 Proxy — dual-mode L4/L7 ingress router for all services.
+//! Sentin8 Proxy - dual-mode L4/L7 ingress router for all services.
 //!
 //! The proxy sits on port 443 and routes traffic in two modes:
 //!
-//! - **L4 SNI Passthrough** (internal traffic — loopback/private IPs):
+//! - **L4 SNI Passthrough** (internal traffic - loopback/private IPs):
 //!   Peeks the SNI hostname from the TLS ClientHello, looks it up in
 //!   the `sentin8_domains` cache, and pipes the raw TLS stream to an
 //!   `Active` instance of the target service. Never decrypts TLS.
-//! - **L7 TLS Bridging** (external traffic — public IPs):
+//! - **L7 TLS Bridging** (external traffic - public IPs):
 //!   Terminates the client's TLS using `sentin8-tls` (Acme certs, PQ
 //!   crypto), inspects the HTTP request, enforces WAF/rate-limit/path-ACL
 //!   policies, injects `X-Sentin8-*` tenant context headers at the edge,
@@ -60,7 +60,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Install the Graviola PQ crypto provider before any reqwest HTTPS call
-    // (policy admin/verify clients, TLS sync — reqwest panics "No provider
+    // (policy admin/verify clients, TLS sync - reqwest panics "No provider
     // set" otherwise; COLD-START-1).
     let _ = sentin8::tls::crypto::sentin8_pq_provider().install_default();
 

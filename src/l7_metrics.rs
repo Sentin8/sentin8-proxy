@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! L7 traffic metrics — HTTP status codes, request latency, policy blocks.
+//! L7 traffic metrics - HTTP status codes, request latency, policy blocks.
 //!
 //! These metrics are only available for external (L7) traffic. Internal
 //! (L4) traffic uses the connection-level metrics in `server.rs`.
@@ -14,7 +14,7 @@ use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-/// L7 metrics counters — thread-safe, in-memory.
+/// L7 metrics counters - thread-safe, in-memory.
 #[derive(Clone)]
 pub struct L7Metrics {
     inner: Arc<Mutex<L7MetricsInner>>,
@@ -33,7 +33,7 @@ struct L7MetricsInner {
     /// TCP+TLS setup paid).
     upstream_warm: u64,
     /// PROXY-5: requests that paid a fresh upstream connect
-    /// (pool miss — includes the PQ handshake).
+    /// (pool miss - includes the PQ handshake).
     upstream_cold: u64,
     /// PROXY-5: stale pooled connections discarded + retried fresh.
     upstream_stale_retries: u64,
@@ -84,7 +84,7 @@ impl L7Metrics {
         inner.policy_blocks += 1;
     }
 
-    /// PROXY-5: count one upstream acquisition — warm pooled vs cold
+    /// PROXY-5: count one upstream acquisition - warm pooled vs cold
     /// fresh connect (the cold path pays TCP + PQ TLS handshake).
     pub fn record_upstream_connect(&self, established_fresh: bool) {
         let mut inner = self.inner.lock();

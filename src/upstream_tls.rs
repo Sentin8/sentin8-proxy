@@ -3,11 +3,11 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Re-encryption to backends — opens a new TLS (or plain HTTP) connection
+//! Re-encryption to backends - opens a new TLS (or plain HTTP) connection
 //! to the selected backend instance.
 //!
 //! In `offload` mode (default for v1/dev), the proxy forwards plain HTTP
-//! to the backend — acceptable when proxy and backend are on the same
+//! to the backend - acceptable when proxy and backend are on the same
 //! machine (loopback).
 //!
 //! In `bridge` mode (production), the proxy opens a new TLS connection
@@ -21,14 +21,14 @@ use std::time::Duration;
 
 use crate::config::BackendTlsMode;
 
-/// An upstream connection — either plain TCP (offload mode) or TLS (bridge mode).
+/// An upstream connection - either plain TCP (offload mode) or TLS (bridge mode).
 /// The upstreamconnection type.
-// Request-scoped connection wrapper: the TLS variant's buffer set is bounded and the value lives for one request — the size delta is accepted.
+// Request-scoped connection wrapper: the TLS variant's buffer set is bounded and the value lives for one request - the size delta is accepted.
 #[allow(clippy::large_enum_variant)]
 pub enum UpstreamConnection {
-    /// Plain TCP stream — forward HTTP without TLS (offload mode).
+    /// Plain TCP stream - forward HTTP without TLS (offload mode).
     Plain(tokio::net::TcpStream),
-    /// TLS stream — re-encrypted to backend (bridge mode).
+    /// TLS stream - re-encrypted to backend (bridge mode).
     Tls(tokio_rustls::client::TlsStream<tokio::net::TcpStream>),
 }
 
@@ -60,7 +60,7 @@ pub async fn connect(
 ) -> Result<UpstreamConnection, std::io::Error> {
     match config.mode {
         BackendTlsMode::Offload => {
-            // Plain TCP — no TLS to backend.
+            // Plain TCP - no TLS to backend.
             let stream = tokio::time::timeout(
                 config.connect_timeout,
                 tokio::net::TcpStream::connect(backend_addr),
@@ -103,7 +103,7 @@ async fn connect_tls(
         .ok_or_else(|| {
             std::io::Error::new(
                 std::io::ErrorKind::NotFound,
-                "no crypto provider installed — sentin8-tls must be initialized first",
+                "no crypto provider installed - sentin8-tls must be initialized first",
             )
         })?
         .clone();

@@ -22,7 +22,7 @@ pub enum BackendTlsMode {
 impl BackendTlsMode {
     /// Parse the configured TLS-mode keyword (case-insensitive).
     ///
-    /// Not the `FromStr` trait — no `Err` variant exists (unknown values
+    /// Not the `FromStr` trait - no `Err` variant exists (unknown values
     /// default to `Offload`), so the inherent name stands; call sites use
     /// the qualified path.
     pub fn parse_tls_mode(s: &str) -> Self {

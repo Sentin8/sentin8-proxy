@@ -89,7 +89,7 @@ pub fn inject_tenant_headers(
 }
 
 /// Forward the client's mTLS certificate (PROXY-4, proxy README §7):
-/// the DER leaf certificate, base64-encoded, as `X-Sentin8-Client-Cert` —
+/// the DER leaf certificate, base64-encoded, as `X-Sentin8-Client-Cert` -
 /// the backend's mTLS consumer can verify it against the platform CA
 /// without holding the TLS connection. Client-supplied copies of the
 /// header are already stripped (forgery guard), so this value is always
@@ -104,7 +104,7 @@ pub fn extract_client_cert_header(
     Some(base64_encode(first.as_ref()))
 }
 
-/// Minimal standard base64 (RFC 4648) — avoids pulling the base64 crate
+/// Minimal standard base64 (RFC 4648) - avoids pulling the base64 crate
 /// into the proxy for one call site.
 fn base64_encode(data: &[u8]) -> String {
     const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

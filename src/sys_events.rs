@@ -5,7 +5,7 @@
 
 //! Sys event constants shared by the proxy's MemBus consumers.
 //!
-//! Mirrors `services/sys/src/domain_events.rs` — keep in sync. The proxy
+//! Mirrors `services/sys/src/domain_events.rs` - keep in sync. The proxy
 //! cannot depend on the sys service crate (verticals ← sentin8 one-way;
 //! platform services are peers), so the family name lives here.
 

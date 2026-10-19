@@ -24,22 +24,22 @@ pub struct AppState {
     pub backends: SharedServiceBackendRegistry,
     /// The mappings.
     pub mappings: MappingCache,
-    /// Shield engine (.16 — ): step 5 gates the
+    /// Shield engine (.16 - ): step 5 gates the
     /// management API. The data plane (SNI/L7 bridge) is transport, not
-    /// authorization — tenant isolation rides the X-Sentin8-* context
+    /// authorization - tenant isolation rides the X-Sentin8-* context
     /// headers the upstream services enforce.
     /// The policy.
     pub policy: std::sync::Arc<crate::policy::Engine>,
     /// Shared Sentin8:Policy admin surface.
     /// The admin.
     pub admin: sentin8::shield::admin::SharedAdminState,
-    /// In-flight L7 connection gauge — the drain signal captain polls
+    /// In-flight L7 connection gauge - the drain signal captain polls
     /// via this health payload (`active_connections`, proxy README §7). `None`
     /// when L7 is disabled (all traffic is L4 passthrough, which the
     /// proxy cannot see inside).
     /// The connection gauge.
     pub connection_gauge: Option<std::sync::Arc<crate::tls_proxy::L7ConnectionGauge>>,
-    /// PROXY-5 idle upstream pool — occupancy reported in the health
+    /// PROXY-5 idle upstream pool - occupancy reported in the health
     /// payload (`upstream_pool_size`).
     /// The upstream pool.
     pub upstream_pool: crate::upstream_idle_pool::UpstreamPool,
@@ -64,14 +64,14 @@ pub async fn health(State(state): State<AppState>) -> Json<serde_json::Value> {
         "services": services,
         "total_instances": service_counts.iter().map(|(_, n)| n).sum::<usize>(),
     });
-    // In-flight L7 connection gauge (proxy README §7) — the drain signal
+    // In-flight L7 connection gauge (proxy README §7) - the drain signal
     // captain polls during rolling upgrades (captain README §7). Omitted when L7
-    // is disabled (L4 passthrough connections are opaque TLS pipes — no
+    // is disabled (L4 passthrough connections are opaque TLS pipes - no
     // in-process gauge exists for them).
     if let Some(ref gauge) = state.connection_gauge {
         payload["active_connections"] = serde_json::Value::from(gauge.active_connections());
     }
-    // PROXY-5 upstream pool occupancy (observability — pool health).
+    // PROXY-5 upstream pool occupancy (observability - pool health).
     payload["upstream_pool_size"] = serde_json::Value::from(state.upstream_pool.len());
     Json(payload)
 }
@@ -81,7 +81,7 @@ pub async fn list_backends(
     State(state): State<AppState>,
     headers: axum::http::HeaderMap,
 ) -> Result<impl IntoResponse, (axum::http::StatusCode, String)> {
-    // Step 5 — Shield decides.
+    // Step 5 - Shield decides.
     let a = sentin8::auth::client::verify_bearer_token(&state.admin.auth_client, &headers).await?;
     crate::policy::require_policy(
         &state.policy,
@@ -106,7 +106,7 @@ pub async fn list_mappings(
     State(state): State<AppState>,
     headers: axum::http::HeaderMap,
 ) -> Result<impl IntoResponse, (axum::http::StatusCode, String)> {
-    // Step 5 — Shield decides.
+    // Step 5 - Shield decides.
     let a = sentin8::auth::client::verify_bearer_token(&state.admin.auth_client, &headers).await?;
     crate::policy::require_policy(
         &state.policy,

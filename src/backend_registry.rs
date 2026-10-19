@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Per-service backend registry — Prox's in-memory map of service type →
+//! Per-service backend registry - Prox's in-memory map of service type →
 //! Active instances, kept fresh via Valkey pub/sub on `captain:changed` +
 //! safety poll.
 //!
@@ -77,7 +77,7 @@ impl ServiceBackends {
                 return Some(addr.clone());
             }
         }
-        // All suspect — fall back to round-robin pick.
+        // All suspect - fall back to round-robin pick.
         let idx = self.counter.fetch_add(1, Ordering::Relaxed) % n;
         Some(self.instances[idx].addr.clone())
     }

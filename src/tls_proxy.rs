@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! L7 TLS bridging handler — terminate client TLS, inspect HTTP, enforce
+//! L7 TLS bridging handler - terminate client TLS, inspect HTTP, enforce
 //! policies, inject X-Sentin8-* headers, forward to backend, return response.
 //!
 //! This is the L7 path for external traffic. Internal traffic uses the
@@ -33,7 +33,7 @@ use tokio::net::TcpStream;
 /// In-flight connection gauge for the L7 bridge (proxy README §7).
 /// Incremented at `handle_l7_connection` entry, decremented by the
 /// RAII [`L7ConnectionGuard`] on every exit path so panics and early
-/// returns cannot leak the count. Relaxed ordering — the gauge is the
+/// returns cannot leak the count. Relaxed ordering - the gauge is the
 /// drain signal captain polls via `/v1/health`, never a fence.
 /// The l7 connection gauge.
 pub struct L7ConnectionGauge(AtomicUsize);
@@ -44,7 +44,7 @@ impl L7ConnectionGauge {
         Self(AtomicUsize::new(0))
     }
 
-    /// Enter one in-flight connection — returns a guard that decrements
+    /// Enter one in-flight connection - returns a guard that decrements
     /// on drop.
     pub fn enter(self: &Arc<Self>) -> L7ConnectionGuard {
         self.0.fetch_add(1, Ordering::Relaxed);
@@ -53,7 +53,7 @@ impl L7ConnectionGauge {
         }
     }
 
-    /// Current in-flight connection count — the value reported as
+    /// Current in-flight connection count - the value reported as
     /// `active_connections` in the proxy's health payload (proxy README §7).
     pub fn active_connections(&self) -> u64 {
         self.0.load(Ordering::Relaxed) as u64
@@ -73,7 +73,7 @@ impl Default for L7ConnectionGauge {
     }
 }
 
-/// RAII guard for one in-flight L7 connection — the drop half of
+/// RAII guard for one in-flight L7 connection - the drop half of
 /// [`L7ConnectionGauge::enter`].
 /// The l7 connection guard.
 pub struct L7ConnectionGuard {
@@ -107,9 +107,9 @@ pub struct L7State {
     pub mtls_key_path: Option<String>,
     /// The metrics.
     pub metrics: L7Metrics,
-    /// In-flight connection gauge — the drain signal (proxy README §7).
+    /// In-flight connection gauge - the drain signal (proxy README §7).
     pub connection_gauge: Arc<L7ConnectionGauge>,
-    /// PROXY-5: idle upstream-connection pool — warmed TLS/TCP
+    /// PROXY-5: idle upstream-connection pool - warmed TLS/TCP
     /// sessions per (backend_addr, sni), removing the per-request PQ
     /// handshake from proxied requests.
     pub upstream_pool: UpstreamPool,
@@ -118,7 +118,7 @@ pub struct L7State {
 /// Handle a single external TCP connection in L7 TLS bridging mode.
 ///
 /// Flow:
-/// 1. Enter the in-flight gauge (RAII guard — proxy README §7 drain signal)
+/// 1. Enter the in-flight gauge (RAII guard - proxy README §7 drain signal)
 /// 2. Terminate the client's TLS (using sentin8-tls + Acme certs)
 /// 3. Read the HTTP request from the decrypted stream
 /// 4. Look up the Host header in the sentin8_domains cache
@@ -134,19 +134,19 @@ pub async fn handle_l7_connection(
     client_addr: SocketAddr,
     state: Arc<L7State>,
 ) {
-    // 0. Enter the in-flight gauge (proxy README §7) — the guard decrements
+    // 0. Enter the in-flight gauge (proxy README §7) - the guard decrements
     // on every exit path (return, panic, task abort), so the drain signal
     // cannot leak.
     let _conn_guard = state.connection_gauge.enter();
 
-    // 1. TLS handshake — terminate the client's TLS.
+    // 1. TLS handshake - terminate the client's TLS.
     let mut tls_stream = match state.tls_acceptor.accept(client_stream).await {
         Ok(s) => s,
         Err(e) => {
             tracing::debug!(
                 %client_addr,
                 error = %e,
-                "proxy L7: TLS handshake failed — closing connection"
+                "proxy L7: TLS handshake failed - closing connection"
             );
             state.metrics.record_handshake_error();
             return;
@@ -196,13 +196,13 @@ pub async fn handle_l7_connection(
     // policy engine (WAF, rate limiting, path ACLs) and are forwarded
     // directly to the backend that owns the domain. The backend's
     // sentin8-tls serves the challenge token. No tenant context headers
-    // are injected — the challenge request is unauthenticated by design.
+    // are injected - the challenge request is unauthenticated by design.
     if is_acme_challenge(&parsed.uri) {
         tracing::debug!(
             %client_addr,
             host = %host,
             uri = %parsed.uri,
-            "proxy L7: ACME challenge passthrough — bypassing policy engine"
+            "proxy L7: ACME challenge passthrough - bypassing policy engine"
         );
 
         // Look up the mapping for this host (needed to find the backend).
@@ -241,7 +241,7 @@ pub async fn handle_l7_connection(
         };
 
         // Connect to the backend and forward the request as-is (no
-        // injected headers — ACME challenge is unauthenticated).
+        // injected headers - ACME challenge is unauthenticated).
         let upstream_config = UpstreamTlsConfig {
             mode: state.backend_tls_mode,
             connect_timeout: state.connect_timeout,
@@ -265,7 +265,7 @@ pub async fn handle_l7_connection(
                     host = %host,
                     backend = %backend_addr,
                     error = %e,
-                    "proxy L7: ACME challenge — failed to connect to backend"
+                    "proxy L7: ACME challenge - failed to connect to backend"
                 );
                 let _ = write_http_error(
                     &mut tls_stream,
@@ -304,7 +304,7 @@ pub async fn handle_l7_connection(
             tracing::debug!(
                 %client_addr,
                 host = %host,
-                "proxy L7: no mapping for host — returning 421"
+                "proxy L7: no mapping for host - returning 421"
             );
             let _ = write_http_error(
                 &mut tls_stream,
@@ -340,7 +340,7 @@ pub async fn handle_l7_connection(
     let mut injected_headers =
         header_injector::inject_tenant_headers(&parsed.headers, &mapping, &host);
     // PROXY-4: forward the mTLS client certificate (base64 DER) so the
-    // backend's mTLS consumer can verify it — never a client-supplied value
+    // backend's mTLS consumer can verify it - never a client-supplied value
     // (stripped by the injector), always the certificate this connection
     // terminated. Absent when no client certificate was presented.
     if let Some(cert) = header_injector::extract_client_cert_header(&tls_stream) {
@@ -362,7 +362,7 @@ pub async fn handle_l7_connection(
                     %client_addr,
                     host = %host,
                     service = %mapping.service,
-                    "proxy L7: no Active instances — returning 502"
+                    "proxy L7: no Active instances - returning 502"
                 );
                 let _ = write_http_error(
                     &mut tls_stream,
@@ -376,7 +376,7 @@ pub async fn handle_l7_connection(
         }
     };
 
-    // 8. Connect to the backend — pool-first (PROXY-5): a warm pooled
+    // 8. Connect to the backend - pool-first (PROXY-5): a warm pooled
     // connection skips the TCP + PQ TLS handshake entirely; a miss
     // connects fresh (and is refilled for the next request). A stale
     // pooled connection (backend respawned) fails transport once; the
@@ -452,7 +452,7 @@ pub async fn handle_l7_connection(
 
     // 9. Forward the request to the backend and pipe the response back.
     // PROXY-5: a FIRST transport error on this (possibly pooled) upstream
-    // is treated as a stale connection — discard and retry ONCE on a
+    // is treated as a stale connection - discard and retry ONCE on a
     // fresh connect. The retry metric keeps stale-conn artifacts
     // observable without surfacing them as 502s.
     let outcome = forward_request_once(
@@ -473,7 +473,7 @@ pub async fn handle_l7_connection(
                 %client_addr,
                 %host,
                 error = %stale_err,
-                "proxy L7: upstream transport error — retrying once on a fresh connection (PROXY-5)"
+                "proxy L7: upstream transport error - retrying once on a fresh connection (PROXY-5)"
             );
             state.metrics.record_upstream_stale_retry();
             match upstream_tls::connect(&backend_addr, &host, &upstream_config).await {
@@ -525,16 +525,16 @@ pub async fn handle_l7_connection(
 enum ForwardOutcome {
     /// Response fully delivered; `status` is the backend's status. A
     /// REUSABLE upstream was already returned to the pool by
-    /// [`pipe_response`] — the caller never touches the socket again.
+    /// [`pipe_response`] - the caller never touches the socket again.
     Done { status: u16 },
-    /// Transport failed before any response byte reached the client —
+    /// Transport failed before any response byte reached the client -
     /// the caller retries once on a fresh connection (PROXY-5).
     Stale(String),
 }
 
 /// PROXY-5 retryable forward: a transport failure **before any response
 /// byte reaches the client** (the request-write phase) returns
-/// [`ForwardOutcome::Stale`] instead of writing a 502 — the caller
+/// [`ForwardOutcome::Stale`] instead of writing a 502 - the caller
 /// retries once on a fresh connection. Once the response pipe has
 /// STARTED, the request is committed to the client: never retried (a
 /// second send would double-deliver).
@@ -551,7 +551,7 @@ async fn forward_request_once(
 ) -> ForwardOutcome {
     let request_bytes = build_http_request_bytes(parsed, injected_headers);
 
-    // Send the request (the stale-retryable phase — nothing reached the
+    // Send the request (the stale-retryable phase - nothing reached the
     // client yet); then hand the WHOLE upstream to pipe_response, which
     // matches the variant to recover the concrete stream on reuse.
     match &mut upstream {
@@ -576,18 +576,18 @@ async fn forward_request_once(
 /// status + framing header, and streams the body. When the response is
 /// Content-Length- or chunked-framed AND the cycle completes healthy,
 /// the upstream is returned to the pool for the NEXT request (HTTP/1.1
-/// keep-alive — the PQ handshake amortizes across requests).
+/// keep-alive - the PQ handshake amortizes across requests).
 /// `Connection: close` or close-delimited bodies (HTTP/1.0, no length)
 /// end at EOF: the connection is consumed, never pooled.
 ///
 /// Split into a non-generic [`pipe_response`] (matches on the
 /// `UpstreamConnection` enum, puts reusable streams back) and a generic
-/// [`pipe_framed`] (shared framing logic for Plain/TLS streams) — the
+/// [`pipe_framed`] (shared framing logic for Plain/TLS streams) - the
 /// pool needs the CONCRETE stream type to hand off, which a generic `R`
 /// cannot name.
 ///
 /// PROXY-5 stale class: an EOF/read error BEFORE any response byte
-/// reaches the client returns [`ForwardOutcome::Stale`] — the caller
+/// reaches the client returns [`ForwardOutcome::Stale`] - the caller
 /// retries once on a fresh connection. Once bytes reached the client
 /// the request is committed: never retried (double-delivery).
 async fn pipe_response(
@@ -633,7 +633,7 @@ async fn pipe_response(
 struct PipedStream<S> {
     outcome: ForwardOutcome,
     reusable: bool,
-    /// Recovered only when `reusable` — `None` when consumed (stale /
+    /// Recovered only when `reusable` - `None` when consumed (stale /
     /// close-delimited / mid-pipe failure).
     stream: Option<S>,
 }
@@ -663,7 +663,7 @@ async fn pipe_framed<S: AsyncReadExt + Unpin>(
         let mut tmp = [0u8; 4096];
         match backend.read(&mut tmp).await {
             Ok(0) => {
-                // EOF before headers — stale/crashed backend. The client
+                // EOF before headers - stale/crashed backend. The client
                 // received NOTHING (safe retry on a fresh connection).
                 return PipedStream {
                     outcome: ForwardOutcome::Stale("backend closed before response".into()),
@@ -676,7 +676,7 @@ async fn pipe_framed<S: AsyncReadExt + Unpin>(
                 header_buf.extend_from_slice(&tmp[..n]);
             }
             Err(e) => {
-                // Headers not yet flushed to the client — retryable.
+                // Headers not yet flushed to the client - retryable.
                 return PipedStream {
                     outcome: ForwardOutcome::Stale(format!("backend read error: {e}")),
 
@@ -740,7 +740,7 @@ async fn pipe_framed<S: AsyncReadExt + Unpin>(
                 let want = buf.len().min(remaining as usize);
                 match backend.read(&mut buf[..want]).await {
                     Ok(0) => {
-                        // Truncated body — connection state is garbage.
+                        // Truncated body - connection state is garbage.
                         let _ = client_tls.flush().await;
                         return PipedStream {
                             outcome: ForwardOutcome::Done {
@@ -777,7 +777,7 @@ async fn pipe_framed<S: AsyncReadExt + Unpin>(
                 }
             }
             let _ = client_tls.flush().await;
-            // PROXY-5 keep-alive: framed cycle complete — the stream is
+            // PROXY-5 keep-alive: framed cycle complete - the stream is
             // RECOVERED (pipe_response moves it into the pool).
             PipedStream {
                 outcome: ForwardOutcome::Done {
@@ -797,7 +797,7 @@ async fn pipe_framed<S: AsyncReadExt + Unpin>(
                     break true;
                 }
                 match backend.read(&mut buf).await {
-                    Ok(0) => break false, // EOF before terminator — not poolable
+                    Ok(0) => break false, // EOF before terminator - not poolable
                     Ok(n) => src.extend_from_slice(&buf[..n]),
                     Err(_) => break false,
                 }
@@ -877,7 +877,7 @@ fn detect_framing(headers: &str) -> Result<Option<u64>, ()> {
     Ok(content_length)
 }
 
-/// Find the 0-length chunk terminator (`0\r?\n\r?\n` end sequence) —
+/// Find the 0-length chunk terminator (`0\r?\n\r?\n` end sequence) -
 /// presence means the chunked body completed and the connection is
 /// reusable. Bounded scan: the terminator can never appear past the
 /// final CRLF CRLF.
@@ -886,7 +886,7 @@ fn find_chunked_terminator(buf: &[u8]) -> Option<usize> {
     if len < 5 {
         return None;
     }
-    // The terminal sequence is "0\r\n\r\n" (no trailers supported —
+    // The terminal sequence is "0\r\n\r\n" (no trailers supported -
     // platform backends do not emit trailers).
     if &buf[len - 5..] == b"0\r\n\r\n" {
         return Some(len - 5);
@@ -920,10 +920,10 @@ fn is_acme_challenge(uri: &str) -> bool {
 
 /// Forward raw HTTP request bytes to the backend and pipe the response back.
 ///
-/// This is used for ACME challenge passthrough — the original request
+/// This is used for ACME challenge passthrough - the original request
 /// is forwarded as-is (no header injection, no policy checks). One-shot
 /// cycle: the upstream is NEVER pooled (the challenge must not warm a
-/// reusable session outside the request path) — the pool passed is the
+/// reusable session outside the request path) - the pool passed is the
 /// shared one, but a close-delimited pipe discards the conn anyway; the
 /// framed path putting back is harmless for the one-off backend.
 async fn forward_raw_request(
@@ -937,14 +937,14 @@ async fn forward_raw_request(
     match &mut upstream {
         upstream_tls::UpstreamConnection::Plain(backend) => {
             if let Err(e) = backend.write_all(request_bytes).await {
-                tracing::warn!(error = %e, "proxy L7: ACME challenge — backend write failed");
+                tracing::warn!(error = %e, "proxy L7: ACME challenge - backend write failed");
                 return 502;
             }
             let _ = backend.flush().await;
         }
         upstream_tls::UpstreamConnection::Tls(backend) => {
             if let Err(e) = backend.write_all(request_bytes).await {
-                tracing::warn!(error = %e, "proxy L7: ACME challenge — backend write failed");
+                tracing::warn!(error = %e, "proxy L7: ACME challenge - backend write failed");
                 return 502;
             }
             let _ = backend.flush().await;
@@ -962,7 +962,7 @@ async fn forward_raw_request(
     match outcome {
         ForwardOutcome::Done { status, .. } => status,
         ForwardOutcome::Stale(e) => {
-            tracing::debug!(error = %e, "proxy L7: ACME challenge — backend closed before response");
+            tracing::debug!(error = %e, "proxy L7: ACME challenge - backend closed before response");
             502
         }
     }
@@ -1272,7 +1272,7 @@ mod tests {
 
     #[test]
     fn l7_gauge_pairs_entry_and_exit() {
-        // The in-flight gauge pairs with the RAII guard — every
+        // The in-flight gauge pairs with the RAII guard - every
         // enter() is matched by exactly one drop.
         let gauge = std::sync::Arc::new(L7ConnectionGauge::new());
         assert_eq!(gauge.active_connections(), 0);
