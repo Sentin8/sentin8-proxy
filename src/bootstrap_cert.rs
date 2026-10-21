@@ -37,7 +37,7 @@ pub struct BootstrapCert {
 /// own hostname.
 ///
 /// The cert is valid for `validity_secs` (default 24 hours) and includes:
-/// - The proxy hostname as the CN and primary SAN (e.g. `proxy.ops.sys.sentin8.local`)
+/// - The proxy hostname as the CN and primary SAN (e.g. `proxy.ops.sys.local.sentin8.dev`)
 /// - The local IP as an additional SAN (from `SENTIN8_CAPTAIN_LOCAL_IP`)
 ///
 /// The cert is self-signed (no CA hierarchy) - it is only used to bootstrap
@@ -111,9 +111,9 @@ mod tests {
 
     #[test]
     fn generate_bootstrap_cert_roundtrip() {
-        let cert = generate_bootstrap_cert("proxy.ops.sys.sentin8.local", Some("127.0.0.1"), 86400)
+        let cert = generate_bootstrap_cert("proxy.ops.sys.local.sentin8.dev", Some("127.0.0.1"), 86400)
             .unwrap();
-        assert_eq!(cert.hostname, "proxy.ops.sys.sentin8.local");
+        assert_eq!(cert.hostname, "proxy.ops.sys.local.sentin8.dev");
         assert!(!cert.cert_pem.is_empty());
         assert!(!cert.key_pem.is_empty());
         // Cert should be PEM-encoded.
@@ -123,15 +123,15 @@ mod tests {
 
     #[test]
     fn generate_bootstrap_cert_without_ip() {
-        let cert = generate_bootstrap_cert("proxy.ops.sys.sentin8.local", None, 3600).unwrap();
+        let cert = generate_bootstrap_cert("proxy.ops.sys.local.sentin8.dev", None, 3600).unwrap();
         assert!(!cert.cert_pem.is_empty());
     }
 
     #[test]
     fn proxy_hostname_derivation() {
         assert_eq!(
-            proxy_hostname("sentin8.local"),
-            "proxy.ops.sys.sentin8.local"
+            proxy_hostname("local.sentin8.dev"),
+            "proxy.ops.sys.local.sentin8.dev"
         );
         assert_eq!(proxy_hostname("example.com"), "proxy.ops.sys.example.com");
     }

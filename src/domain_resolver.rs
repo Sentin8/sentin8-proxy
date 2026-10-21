@@ -396,22 +396,22 @@ mod tests {
 
     #[test]
     fn platform_service_host_resolves_statically() {
-        // auth.ops.sys.sentin8.local - the EXACT platform-plane shape:
+        // auth.ops.sys.local.sentin8.dev - the EXACT platform-plane shape:
         // static resolution; the sentin8_domain default must end with the
         // built-in default for this test to hold.
         let f = fixture();
-        let m = f.resolve("auth.ops.sys.sentin8.local").unwrap();
+        let m = f.resolve("auth.ops.sys.local.sentin8.dev").unwrap();
         assert_eq!(m.service, "sentin8:auth");
         assert_eq!(m.org_id, sentin8::config::SYSTEM_ORG_ID);
         assert_eq!(m.env_id, sentin8::config::SYSTEM_ENV_ID);
         assert_eq!(m.application_id, None);
-        assert_eq!(m.hostname, "auth.ops.sys.sentin8.local");
+        assert_eq!(m.hostname, "auth.ops.sys.local.sentin8.dev");
     }
 
     #[test]
     fn platform_service_host_proxy_label() {
         let f = fixture();
-        let m = f.resolve("proxy.ops.sys.sentin8.local").unwrap();
+        let m = f.resolve("proxy.ops.sys.local.sentin8.dev").unwrap();
         assert_eq!(m.service, "sentin8:proxy");
         assert_eq!(m.env_id, sentin8::config::SYSTEM_ENV_ID);
     }
@@ -476,11 +476,11 @@ mod tests {
 
     #[test]
     fn ops_org_domain_hostname_routes_to_web() {
-        // ops.sys.sentin8.local - 4 labels, NOT the 3+domain platform
+        // ops.sys.local.sentin8.dev - 4 labels, NOT the 3+domain platform
         // shape → falls to the tenant walk → service label "ops"... the
         // subdomain map does not know it → web.
         let f = fixture();
-        let m = f.resolve("ops.sys.sentin8.local").unwrap();
+        let m = f.resolve("ops.sys.local.sentin8.dev").unwrap();
         assert_eq!(m.service, "sentin8:web");
     }
 }

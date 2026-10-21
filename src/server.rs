@@ -607,7 +607,7 @@ async fn forward_challenge_to_acme(
     let port: u16 = port.parse()?;
     let socket_addr: std::net::SocketAddr = format!("{ip}:{port}").parse()?;
     let sentin8_domain =
-        std::env::var("SENTIN8_DOMAIN").unwrap_or_else(|_| "sentin8.local".to_string());
+        std::env::var("SENTIN8_DOMAIN").unwrap_or_else(|_| "local.sentin8.dev".to_string());
     let sni_host = format!("acme.ops.sys.{sentin8_domain}");
     let url = format!("https://{sni_host}:{port}{path}");
     let client = reqwest::Client::builder()

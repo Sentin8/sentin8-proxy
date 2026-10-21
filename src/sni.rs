@@ -209,7 +209,7 @@ mod tests {
 
     #[test]
     fn sni_valid_record() {
-        let name = "auth.ops.sys.sentin8.local";
+        let name = "auth.ops.sys.local.sentin8.dev";
         let buf = client_hello_record(&[(0x0000, sni_extension(&[name]))]);
         assert_eq!(parse_sni_from_record(&buf).unwrap(), Some(name.to_string()));
     }
@@ -217,7 +217,7 @@ mod tests {
     #[test]
     fn sni_after_other_extensions() {
         // SNI must be found even when it is not the first extension.
-        let name = "dash.ops.sys.sentin8.local";
+        let name = "dash.ops.sys.local.sentin8.dev";
         let buf = client_hello_record(&[
             (0x0017, Vec::new()), // extended_master_secret
             (0xff01, vec![0x00]), // renegotiation_info (1 byte payload)
@@ -243,13 +243,13 @@ mod tests {
         let buf = client_hello_record(&[(
             0x0000,
             sni_extension(&[
-                "first.ops.sys.sentin8.local",
-                "second.ops.sys.sentin8.local",
+                "first.ops.sys.local.sentin8.dev",
+                "second.ops.sys.local.sentin8.dev",
             ]),
         )]);
         assert_eq!(
             parse_sni_from_record(&buf).unwrap(),
-            Some("first.ops.sys.sentin8.local".to_string())
+            Some("first.ops.sys.local.sentin8.dev".to_string())
         );
     }
 
@@ -301,7 +301,7 @@ mod tests {
     fn sni_truncated_body_returns_none() {
         // Record cut before the ClientHello body finishes: unparseable, but
         // the parser bails with Ok(None) rather than an error.
-        let full = client_hello_record(&[(0x0000, sni_extension(&["auth.ops.sys.sentin8.local"]))]);
+        let full = client_hello_record(&[(0x0000, sni_extension(&["auth.ops.sys.local.sentin8.dev"]))]);
         assert_eq!(parse_sni_from_record(&full[..40]).unwrap(), None);
     }
 
@@ -309,7 +309,7 @@ mod tests {
     fn sni_truncated_host_name_returns_none() {
         // Record cut 17 bytes short - inside the host_name bytes: the length
         // field promises more than the buffer holds → Ok(None).
-        let full = client_hello_record(&[(0x0000, sni_extension(&["auth.ops.sys.sentin8.local"]))]);
+        let full = client_hello_record(&[(0x0000, sni_extension(&["auth.ops.sys.local.sentin8.dev"]))]);
         assert_eq!(
             parse_sni_from_record(&full[..full.len() - 17]).unwrap(),
             None
@@ -321,7 +321,7 @@ mod tests {
         // A cipher_suites length that points past the record: parse bails
         // with Ok(None).
         let mut buf =
-            client_hello_record(&[(0x0000, sni_extension(&["auth.ops.sys.sentin8.local"]))]);
+            client_hello_record(&[(0x0000, sni_extension(&["auth.ops.sys.local.sentin8.dev"]))]);
         // cipher_suites_len sits at offset 5 (record hdr) + 4 (handshake
         // hdr) + 2 (client version) + 32 (random) + 1 (session id len) = 44.
         buf[44] = 0xff;

@@ -188,7 +188,7 @@ mod tests {
     fn pool_take_on_empty_is_none() {
         let pool = UpstreamPool::new();
         assert!(pool
-            .take("127.0.0.1:3001", "auth.ops.sys.sentin8.local")
+            .take("127.0.0.1:3001", "auth.ops.sys.local.sentin8.dev")
             .is_none());
         assert_eq!(pool.len(), 0);
     }
@@ -207,9 +207,9 @@ mod tests {
         let conn = UpstreamConnection::Plain(tokio::net::TcpStream::from_std(accepted).unwrap());
 
         let pool = UpstreamPool::new();
-        pool.put(&addr, "auth.ops.sys.sentin8.local", conn);
+        pool.put(&addr, "auth.ops.sys.local.sentin8.dev", conn);
         assert_eq!(pool.len(), 1);
-        assert!(pool.take(&addr, "auth.ops.sys.sentin8.local").is_some());
+        assert!(pool.take(&addr, "auth.ops.sys.local.sentin8.dev").is_some());
         assert_eq!(pool.len(), 0);
     }
 
@@ -230,7 +230,7 @@ mod tests {
             // a surplus connection is dropped, never double-pooled.
             pool.put(
                 &addr,
-                "auth.ops.sys.sentin8.local",
+                "auth.ops.sys.local.sentin8.dev",
                 UpstreamConnection::Plain(c),
             );
         }

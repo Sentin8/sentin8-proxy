@@ -161,7 +161,7 @@ mod tests {
 
     fn make_mapping() -> DomainMapping {
         DomainMapping {
-            hostname: "auth.qa1.org1.sentin8.local".to_string(),
+            hostname: "auth.qa1.org1.local.sentin8.dev".to_string(),
             service: "auth".to_string(),
             org_id: Uuid::new_v4(),
             env_id: Uuid::new_v4(),
@@ -175,7 +175,7 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert(
             "host",
-            HeaderValue::from_static("auth.qa1.org1.sentin8.local"),
+            HeaderValue::from_static("auth.qa1.org1.local.sentin8.dev"),
         );
         headers.insert(
             "x-sentin8-env-id",
@@ -184,7 +184,7 @@ mod tests {
         headers.insert("authorization", HeaderValue::from_static("Bearer token"));
 
         let mapping = make_mapping();
-        let result = inject_tenant_headers(&headers, &mapping, "auth.qa1.org1.sentin8.local");
+        let result = inject_tenant_headers(&headers, &mapping, "auth.qa1.org1.local.sentin8.dev");
 
         // Forged header should be replaced.
         assert_ne!(
@@ -203,11 +203,11 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert(
             "host",
-            HeaderValue::from_static("auth.qa1.org1.sentin8.local"),
+            HeaderValue::from_static("auth.qa1.org1.local.sentin8.dev"),
         );
 
         let mapping = make_mapping();
-        let result = inject_tenant_headers(&headers, &mapping, "auth.qa1.org1.sentin8.local");
+        let result = inject_tenant_headers(&headers, &mapping, "auth.qa1.org1.local.sentin8.dev");
 
         assert_eq!(
             result.get("x-sentin8-env-id").unwrap().to_str().unwrap(),

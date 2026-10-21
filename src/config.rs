@@ -95,7 +95,7 @@ pub struct ProxConfig {
     /// Proxy's mTLS client key path (bridging mode).
     /// The mtls key path.
     pub mtls_key_path: Option<String>,
-    /// Root Sentin8 domain (e.g. sentin8.local).
+    /// Root Sentin8 domain (e.g. local.sentin8.dev).
     /// The sentin8 domain.
     pub sentin8_domain: String,
 }
@@ -114,7 +114,7 @@ impl ProxConfig {
             .unwrap_or_else(|_| sentin8::config::Sentin8Config::default_database_url().to_string());
 
         let sentin8_domain =
-            env::var("SENTIN8_DOMAIN").unwrap_or_else(|_| "sentin8.local".to_string());
+            env::var("SENTIN8_DOMAIN").unwrap_or_else(|_| "local.sentin8.dev".to_string());
 
         Self {
             tcp_port: env::var("SENTIN8_PROXY_PORT")
