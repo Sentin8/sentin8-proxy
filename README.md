@@ -172,6 +172,15 @@ graph TD
     only).
   - The management listener binds before spawning so `make status`
     works while services start.
+  - The client-certificate posture (`SENTIN8_MTLS_CLIENT_AUTH`,
+    DESIGN 9a.12): `off` (default) requests no client certificate;
+    `self_signed` requests one and accepts ANY presented cert at the
+    handshake - the RFC 8705 trust decision ALWAYS stays in the
+    backend (Sentin8:Auth binds the forwarded cert's thumbprint
+    against the registration row; an unregistered cert authenticates
+    nothing). The presented leaf is forwarded as base64
+    `X-Sentin8-Client-Cert` (PROXY-4); client-supplied copies of that
+    header are stripped first.
 - **Boot.** Self-issued bootstrap certificate → backend registry load →
   domain resolver (membus consumer + bus consumer + safety poll) →
   Shield boot (one engine, shared with the policy-admin API) →

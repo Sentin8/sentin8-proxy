@@ -19,6 +19,17 @@ pub enum BackendTlsMode {
     Offload,
 }
 
+/// Client-certificate posture at the edge listener (DESIGN 9a.12).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MtlsClientAuth {
+    /// No client certificate is requested (default).
+    Off,
+    /// A client certificate is REQUESTED and ANY presented cert is
+    /// accepted at the handshake; the RFC 8705 trust decision stays with
+    /// Sentin8:Auth (registered thumbprint / DN equality).
+    SelfSigned,
+}
+
 impl BackendTlsMode {
     /// Parse the configured TLS-mode keyword (case-insensitive).
     ///
@@ -95,6 +106,8 @@ pub struct ProxConfig {
     /// Proxy's mTLS client key path (bridging mode).
     /// The mtls key path.
     pub mtls_key_path: Option<String>,
+    /// Client-certificate posture at the edge listener (DESIGN 9a.12).
+    pub mtls_client_auth: MtlsClientAuth,
     /// Root Sentin8 domain (e.g. local.sentin8.dev).
     /// The sentin8 domain.
     pub sentin8_domain: String,
@@ -179,6 +192,18 @@ impl ProxConfig {
             ),
             mtls_cert_path: env::var("SENTIN8_PROXY_MTLS_CERT_PATH").ok(),
             mtls_key_path: env::var("SENTIN8_PROXY_MTLS_KEY_PATH").ok(),
+            // CLIENT-CERT posture at the edge (DESIGN 9a.12): `off`
+            // (default, today) requests no client certificate;
+            // `self_signed` requests one and accepts ANY presented cert
+            // (RFC 8705 self_signed_tls_client_auth clients - the
+            // application layer binds the thumbprint).
+            mtls_client_auth: match env::var("SENTIN8_MTLS_CLIENT_AUTH")
+                .unwrap_or_else(|_| "off".to_string())
+                .as_str()
+            {
+                "self_signed" => MtlsClientAuth::SelfSigned,
+                _ => MtlsClientAuth::Off,
+            },
             sentin8_domain,
         }
     }

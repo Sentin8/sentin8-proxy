@@ -383,8 +383,20 @@ async fn build_l7_state(
         .expect("proxy: failed to build sentin8-tls for edge termination");
 
     let cert_resolver = tls.cert_resolver();
-    let tls_acceptor =
-        ProxyTlsAcceptor::new(cert_resolver).expect("proxy: failed to create TLS acceptor");
+    // Client-certificate posture (DESIGN 9a.12): `self_signed` requests a
+    // client certificate at the handshake and accepts any presented cert -
+    // the RFC 8705 trust decision stays with the backend (auth's
+    // registered-thumbprint/DN comparison). Default posture: no client cert
+    // requested.
+    let tls_acceptor = match config.mtls_client_auth {
+        crate::config::MtlsClientAuth::SelfSigned => ProxyTlsAcceptor::new_allow_self_signed(
+            cert_resolver,
+        )
+        .expect("proxy: failed to create mTLS (self-signed) TLS acceptor"),
+        crate::config::MtlsClientAuth::Off => {
+            ProxyTlsAcceptor::new(cert_resolver).expect("proxy: failed to create TLS acceptor")
+        }
+    };
 
     // Build the policy engine.
     let policy_engine = PolicyEngine::new(PolicyConfig {

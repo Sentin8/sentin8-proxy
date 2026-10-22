@@ -48,13 +48,18 @@ pub fn inject_tenant_headers(
 ) -> HeaderMap {
     let mut new_headers = HeaderMap::new();
 
-    // Preserve all non-X-Sentin8-* headers.
+    // Preserve all non-X-Sentin8-* headers. APPEND (never insert): a
+    // forwarded request may lawfully carry repeated header lines (the
+    // DPoP proof header, Cookie, Set-Cookie...) - RFC 9449 §4.1 requires
+    // the RS to see every DPoP header so a two-proof request is still
+    // rejectable; insert() would collapse the duplicates and silently
+    // bless the forged shape.
     for (name, value) in original_headers.iter() {
         let name_str = name.as_str().to_ascii_lowercase();
         if SENTIN8_HEADERS.contains(&name_str.as_str()) {
             continue;
         }
-        new_headers.insert(name.clone(), value.clone());
+        new_headers.append(name.clone(), value.clone());
     }
 
     // Inject resolved tenant context.

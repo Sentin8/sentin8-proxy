@@ -1089,9 +1089,27 @@ fn parse_http_request(data: &[u8]) -> Option<ParsedRequest> {
                 HeaderName::from_bytes(name.as_bytes()),
                 HeaderValue::from_str(value),
             ) {
-                headers.insert(hn, hv);
+                // APPEND (never insert): repeated header lines are lawful
+                // and semantically LOAD-BEARING - the DPoP proof header
+                // pair (RFC 9449 §4.1) must reach the backend as TWO
+                // lines so the RS can reject the two-proof request shape;
+                // insert() would collapse the duplicates.
+                headers.append(hn, hv);
             }
         }
+    }
+
+    // Inbound wire observability (DESIGN §4.4 header transparency): a
+    // duplicated DPoP proof header means the client is attempting the
+    // RFC 9449 §4.1 negative shape - log it so operator traces can tell
+    // client-side collapse from forwarding defects.
+    let dpop_count = headers.get_all("dpop").iter().count();
+    if dpop_count > 1 {
+        tracing::warn!(
+            dpop_headers = dpop_count,
+            uri = %uri,
+            "request carries multiple DPoP proof headers - forwarding all of them"
+        );
     }
 
     Some(ParsedRequest {
