@@ -84,9 +84,9 @@ dependencies = [
 
 [[package]]
 name = "arc-swap"
-version = "1.9.2"
+version = "1.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c049c0be4daef0b145cb3555416b3b8ef5b7888a38aea1a3a155801fe7b0810b"
+checksum = "380962b3d93b99642e50b9febf72c071e97e8b32d86eae9cf4ef582bb960ae6e"
 dependencies = [
  "rustversion",
 ]
@@ -108,9 +108,9 @@ dependencies = [
 
 [[package]]
 name = "async-compression"
-version = "0.4.50"
+version = "0.4.51"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee19bd99b43e3691acbad4e840420a4881cea6c0b66a208125a824f8fd53f5a1"
+checksum = "9d5755640120b24961f8231e05892e4a4f7e0d04e8aeca161508c9c397946970"
 dependencies = [
  "compression-codecs",
  "compression-core",
@@ -161,9 +161,9 @@ checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
 name = "aws-config"
-version = "1.12.0"
+version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8d7b388a9fc3a6db15a5ec778c38b354eff1364882c94d08e0252f7a47dcaa4"
+checksum = "939e256cfe0ed68e96d32f194339d88210d5c10685cff0787400158f852c6819"
 dependencies = [
  "aws-credential-types",
  "aws-runtime",
@@ -176,7 +176,7 @@ dependencies = [
  "aws-smithy-runtime",
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "aws-types",
  "bytes",
  "fastrand",
@@ -192,13 +192,13 @@ dependencies = [
 
 [[package]]
 name = "aws-credential-types"
-version = "1.3.0"
+version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e93964ffdaf57857f544be3666a5f57570bb699e934700f11b49708f61bb556e"
+checksum = "576e8da35751dc85409ec1cd15999f692c277a1fbe9336780fe6f15e49dd637d"
 dependencies = [
  "aws-smithy-async",
  "aws-smithy-runtime-api",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "zeroize",
 ]
 
@@ -227,9 +227,9 @@ dependencies = [
 
 [[package]]
 name = "aws-runtime"
-version = "1.10.0"
+version = "1.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b8a9911551b4ea6ca13805ef52ed96f7d2bbb43cc3b4a14cb0776a71f33cfaa"
+checksum = "9a0cc2144962cc5e358467b16e3d82981b1d424a7c3d34602be0036103814a1a"
 dependencies = [
  "aws-credential-types",
  "aws-sigv4",
@@ -237,7 +237,7 @@ dependencies = [
  "aws-smithy-http",
  "aws-smithy-runtime",
  "aws-smithy-runtime-api",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "aws-types",
  "bytes",
  "bytes-utils",
@@ -252,9 +252,9 @@ dependencies = [
 
 [[package]]
 name = "aws-sdk-sso"
-version = "1.114.0"
+version = "1.117.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12be2f9c8eef7f5fc919c96d538e629698469a02b4cb75408b26b1bd984ebe79"
+checksum = "5316813498fa9c403877007934ae448aa44b18136f58051f8fa3c5b79b44bdc6"
 dependencies = [
  "arc-swap",
  "aws-credential-types",
@@ -266,7 +266,7 @@ dependencies = [
  "aws-smithy-runtime",
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "aws-types",
  "bytes",
  "fastrand",
@@ -277,9 +277,9 @@ dependencies = [
 
 [[package]]
 name = "aws-sdk-ssooidc"
-version = "1.116.0"
+version = "1.119.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7645db8724ea3b82fdccfb67e1b0f637c9d8ab0e7ef29d84884d8d8d73f805d"
+checksum = "31db35e5662787b786daba15f431e4393c7ea512b70fa112bd048d1f3ecf877a"
 dependencies = [
  "arc-swap",
  "aws-credential-types",
@@ -291,7 +291,7 @@ dependencies = [
  "aws-smithy-runtime",
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "aws-types",
  "bytes",
  "fastrand",
@@ -302,9 +302,9 @@ dependencies = [
 
 [[package]]
 name = "aws-sdk-sts"
-version = "1.119.0"
+version = "1.122.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03e490aa904849b38e770922faac779dd245f5cf8be81f19065acf18d276e4ad"
+checksum = "a10491638d9e560db90c484dbc77d73b8ad202780cdc9b9e92180603acb07ada"
 dependencies = [
  "arc-swap",
  "aws-credential-types",
@@ -317,7 +317,7 @@ dependencies = [
  "aws-smithy-runtime",
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "aws-smithy-xml",
  "aws-types",
  "fastrand",
@@ -328,14 +328,14 @@ dependencies = [
 
 [[package]]
 name = "aws-sigv4"
-version = "1.6.0"
+version = "1.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2312577f088c9fbf4206dfdb884cf1de9407b43e1a923cbed5237775116fc24b"
+checksum = "9d3d48355cb86b15ccbb38b8bc6b87500c824ee4ed8cbc10a961b435242b5e16"
 dependencies = [
  "aws-credential-types",
  "aws-smithy-http",
  "aws-smithy-runtime-api",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "bytes",
  "form_urlencoded",
  "hex",
@@ -349,9 +349,9 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-async"
-version = "1.3.0"
+version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f02e407fb3b54891734224b9ffac8a71fdd35f542500fa1af95754a6b2beb316"
+checksum = "de681a9df7ff79823b759ee17061076ec049cd61a8fa28ece4293d89c9f6964e"
 dependencies = [
  "futures-util",
  "pin-project-lite",
@@ -360,12 +360,12 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-http"
-version = "0.64.1"
+version = "0.64.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "639b4d8f8555f24a9be649811c3eb0b4d4616f4d61daf0c32e28873bc1ea9af1"
+checksum = "ba8960956e0ee0ca3f3161e62913a61bc65a7ef638ca3ef1d4c7159f8443e398"
 dependencies = [
  "aws-smithy-runtime-api",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "bytes",
  "bytes-utils",
  "futures-core",
@@ -375,19 +375,18 @@ dependencies = [
  "http-body-util",
  "percent-encoding",
  "pin-project-lite",
- "pin-utils",
  "tracing",
 ]
 
 [[package]]
 name = "aws-smithy-http-client"
-version = "1.5.0"
+version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51c89cc3f1f281d659a67a519a1b5c6d445b5ce09fa7e5aee40c2c2707e9509d"
+checksum = "aeca69f65362f7375891008ea525fd440ad6db1836458ac188c87b126804114e"
 dependencies = [
  "aws-smithy-async",
  "aws-smithy-runtime-api",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "h2",
  "http 1.5.0",
  "hyper",
@@ -405,13 +404,13 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-json"
-version = "0.63.1"
+version = "0.65.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3385d469edbe8b60cc72002784652b5efca39178192aa9cc4b44c9875c6bdc18"
+checksum = "9f6835fb38bc6fc8c91e584b0366eb4ff595e5c485134dbf4f0bdeaa18856666"
 dependencies = [
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
 ]
 
 [[package]]
@@ -425,22 +424,22 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-query"
-version = "0.62.1"
+version = "0.64.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1d1d71f6562be974caa85442ecd90194c40fdb5df045f182a6c2e872ce95056"
+checksum = "165f6265342a313ad6f7a1ac17a0cdba30c522039d3f41d8d6871ce8a2b34ecd"
 dependencies = [
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "aws-smithy-xml",
  "urlencoding",
 ]
 
 [[package]]
 name = "aws-smithy-runtime"
-version = "1.16.0"
+version = "1.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6e302ac1d88b99652489df31abdec6ac42a2ab2ac3982ad0ac49f64dfaf28ba"
+checksum = "79cef0c41e8ca40f74f68ed8ee4d1ddbde12bb847b95ef9b3c025681ddfae58a"
 dependencies = [
  "aws-smithy-async",
  "aws-smithy-http",
@@ -448,27 +447,26 @@ dependencies = [
  "aws-smithy-observability",
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "bytes",
  "fastrand",
  "http 1.5.0",
  "http-body",
  "http-body-util",
  "pin-project-lite",
- "pin-utils",
  "tokio",
  "tracing",
 ]
 
 [[package]]
 name = "aws-smithy-runtime-api"
-version = "1.19.0"
+version = "1.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0730c16f91124c6a2abb4932c77e299288b3dd9f967ea2e9ec48cc6731e87a4"
+checksum = "06788004dea79018413f381891da6dcca23196acd79c4d51b767fbdacc76eae4"
 dependencies = [
  "aws-smithy-async",
  "aws-smithy-runtime-api-macros",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "bytes",
  "http 1.5.0",
  "pin-project-lite",
@@ -490,12 +488,12 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-schema"
-version = "0.2.1"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8f395d93304280b64b7632fea798d177e74897fe7f063416ce627cd6fa24829"
+checksum = "bec8dae1015a6d959a5faf86fbdf77486cfe19e4ccb6ee009d8a46efc45028a4"
 dependencies = [
  "aws-smithy-runtime-api",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "http 1.5.0",
 ]
 
@@ -521,9 +519,9 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-types"
-version = "1.8.1"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69bb407740a197147da48238ecc94498493c9e85445732360cec180296ca45f1"
+checksum = "55752025c39c0e094962fd73f1c57014b191f678612e517f219468e575af9822"
 dependencies = [
  "base64-simd",
  "bytes",
@@ -534,7 +532,6 @@ dependencies = [
  "itoa",
  "num-integer",
  "pin-project-lite",
- "pin-utils",
  "ryu",
  "serde",
  "time",
@@ -542,27 +539,27 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-xml"
-version = "0.62.1"
+version = "0.64.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b932c8d6dc127fc980eecd78f8694ae9b9551b69a93a7def2a199c1c0033daf"
+checksum = "a6581618a2fd006159016d1c36881d94d61b4a017f4a8d631310875e18252413"
 dependencies = [
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "xmlparser",
 ]
 
 [[package]]
 name = "aws-types"
-version = "1.6.0"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "209f3a6d82a6e9e5f94abbed94c7a26e1c052341002bf57a5fb5481f625896fc"
+checksum = "6ba0d970d3947bb064d2ae1d823efa186c1dbde88f88afa8f6549946e5d8deee"
 dependencies = [
  "aws-credential-types",
  "aws-smithy-async",
  "aws-smithy-runtime-api",
  "aws-smithy-schema",
- "aws-smithy-types 1.8.1",
+ "aws-smithy-types 1.9.0",
  "rustc_version",
  "tracing",
 ]
@@ -768,9 +765,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.8.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6651c9ed80effdc7db0ff72512157f901af5e3549e341e24b1dd4887d836d838"
+checksum = "86e055fa6e3e40ad6187ba25b6855eeb635d5271f8e0f0e1e9a5826b8d75bea0"
 dependencies = [
  "find-msvc-tools",
  "jobserver",
@@ -780,9 +777,9 @@ dependencies = [
 
 [[package]]
 name = "cedar-policy"
-version = "4.13.0"
+version = "4.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e4f5e46c425491b7133eecb3030d82d27301b84bfa08533c59a6902cca7eb80"
+checksum = "4a3951fe28ea48b72e618fc7104b5953389b496f06813da3d9038c0da6735982"
 dependencies = [
  "cedar-policy-core",
  "cedar-policy-formatter",
@@ -801,9 +798,9 @@ dependencies = [
 
 [[package]]
 name = "cedar-policy-core"
-version = "4.13.0"
+version = "4.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a30d11033d59b262bbb380d8bb5dc5c3dd2dd2281675c558ef4fd8a161ce669"
+checksum = "292bc6f7f897fcdfe5291a2fe74e2446817c7b8e01fce0977805877a23943f5b"
 dependencies = [
  "chrono",
  "educe",
@@ -829,9 +826,9 @@ dependencies = [
 
 [[package]]
 name = "cedar-policy-formatter"
-version = "4.13.0"
+version = "4.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a2c8dc671e62597c85caa11694365b76050abcd9f2177f0520ccac0580f9a41"
+checksum = "3bb1d7ab0eecb543e4586b556d72343699663093d951169eeedd2e6ec6fca06c"
 dependencies = [
  "cedar-policy-core",
  "itertools 0.15.0",
@@ -920,9 +917,9 @@ dependencies = [
 
 [[package]]
 name = "compression-codecs"
-version = "0.4.45"
+version = "0.4.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "98fc98460ba0ad5317075d3632b8dfc45d0be8c4a49347c2a38272019717614a"
+checksum = "cae36683101b2899f48bd31f8db9839437356188e3b1ff23096e73dab09ba8fe"
 dependencies = [
  "compression-core",
  "flate2",
@@ -931,9 +928,9 @@ dependencies = [
 
 [[package]]
 name = "compression-core"
-version = "0.4.33"
+version = "0.4.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e8ccc4ea9f6acc32d102c0f6d471d11d913ad15f20c04de743374861fa1d414"
+checksum = "2ebdda89edc534bf8d5dd2857562633b6495557e5846552ade994b99ed13c36a"
 
 [[package]]
 name = "const-hex"
@@ -1032,9 +1029,9 @@ checksum = "338089f42c427b86394a5ee60ff321da23a5c89c9d89514c829687b26359fcff"
 
 [[package]]
 name = "crc32fast"
-version = "1.5.2"
+version = "1.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01a7799fd6b852db0e61728dde9a204c423b44d689dbd432522543614b490e78"
+checksum = "0ba106e844045ddc02c20768ac4b0b7cb45f2cc2ecbd833ac9f5dacb183c2055"
 dependencies = [
  "cfg-if",
 ]
@@ -1108,9 +1105,9 @@ dependencies = [
 
 [[package]]
 name = "ctutils"
-version = "0.4.3"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03bb0e1cc970d482d121d9a1744999169b69a07470b3d644a7894e53fcaf4574"
+checksum = "38d28fb6aa7dd680b3ffd1a3e64e115c177bdba63c0ae7f9cd48129ff05c4fa0"
 dependencies = [
  "cmov",
 ]
@@ -1313,9 +1310,9 @@ dependencies = [
 
 [[package]]
 name = "educe"
-version = "0.7.6"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e451fac8dd8dece16234604bf1efce6e90fddd8ab6ad4d66eec0eca5160959dd"
+checksum = "1ebdb1f8f8d2815bbe7b369a7da10343c82026a4503b68bd1279ba557611e96d"
 dependencies = [
  "enum-ordinalize",
  "proc-macro2",
@@ -1460,9 +1457,9 @@ dependencies = [
 
 [[package]]
 name = "find-msvc-tools"
-version = "0.1.14"
+version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aedcfb3409746eddb02b9e19ebda1c3394f759a152e48ee875a0844d1b955484"
+checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
 
 [[package]]
 name = "fixedbitset"
@@ -2095,9 +2092,9 @@ dependencies = [
 
 [[package]]
 name = "icu_collections"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa68d21081c4a05d5a901a1c62add574c77048b6a1c67be3b50ce0b60d4ca513"
+checksum = "fe090a42a0d3140fed8c63263ed1fecc02422cb2f4bfe55cd8de2de1b8e105dd"
 dependencies = [
  "displaydoc",
  "potential_utf",
@@ -2109,9 +2106,9 @@ dependencies = [
 
 [[package]]
 name = "icu_locale_core"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d56e28588da92eee5c3201a6eff33fabdd49b62269c8938d4ff050ce4d900deb"
+checksum = "25d29b57c17c6528d0dc4c2141cfa2d08200465acb537a3909c8b9b8a4a984c0"
 dependencies = [
  "displaydoc",
  "litemap",
@@ -2122,9 +2119,9 @@ dependencies = [
 
 [[package]]
 name = "icu_normalizer"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12f9cf5f235641ed274641dd81c3f28d870e276763d0797aeeab72317b1c646f"
+checksum = "404a3b8c486f205c87fe7f23ab6894d84a4ad76d6e4671ae1981ba7def87c599"
 dependencies = [
  "icu_collections",
  "icu_normalizer_data",
@@ -2136,15 +2133,15 @@ dependencies = [
 
 [[package]]
 name = "icu_normalizer_data"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1563da1ed3e0b3bf3d74c9b85917ac9c56464d2f57242270c09c9e752f8021a0"
+checksum = "20f0088bfb7441f7a37fa0c9e20cb1e9cba1cac6b9ce8cd2a6dc44294f8e8cbc"
 
 [[package]]
 name = "icu_properties"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e7ca276ad3145661a65914e6daf131ca5120cd3dcee8f8f3214b8875184a148"
+checksum = "2ea83d991c56158f7cf898bf86436c1dfe7c07ee82fe88951f2695c9f37a379f"
 dependencies = [
  "displaydoc",
  "icu_collections",
@@ -2157,15 +2154,15 @@ dependencies = [
 
 [[package]]
 name = "icu_properties_data"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e590f038c1464a96894fd6d10127e90a8be4509f56ff7ecef851b15cee0b7caa"
+checksum = "b98f29af82d02b163fe50161388350e743bb3107cc8e8c2f7314cb505faddfcf"
 
 [[package]]
 name = "icu_provider"
-version = "2.3.1"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d27bbb9d3abbefac45d55f647c9de1d44aafcd1186eb91879afef17c396c3e73"
+checksum = "413099315636c588ee8f011190b329b971a09a8fae9d157e01dcae8379468514"
 dependencies = [
  "displaydoc",
  "icu_locale_core",
@@ -2491,7 +2488,7 @@ dependencies = [
  "bitflags 2.13.2",
  "libc",
  "plain",
- "redox_syscall 0.9.4",
+ "redox_syscall 0.9.5",
 ]
 
 [[package]]
@@ -3475,9 +3472,9 @@ dependencies = [
 
 [[package]]
 name = "redox_syscall"
-version = "0.9.4"
+version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "737970939a87c6fa31e7acad13307bccbb017a073b695b6089a2c484f929e20e"
+checksum = "580c875845b41ecb1564ad1ae4703044cef774145e3d7a94dc2b3fa7c97868fd"
 dependencies = [
  "bitflags 2.13.2",
 ]
@@ -3792,9 +3789,9 @@ checksum = "eec689c0bc40ff2458a5977b6619cb718087084a18e02a131c599b62d05e1a5f"
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.15"
+version = "0.103.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2"
+checksum = "4443b1b6d39d7c663139942cc4558262562d2c84123bb6282ef177009ca8b281"
 dependencies = [
  "aws-lc-rs",
  "ring",
@@ -3932,7 +3929,7 @@ checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
 [[package]]
 name = "sentin8"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "sentin8-audit",
  "sentin8-auth-client",
@@ -3964,7 +3961,7 @@ dependencies = [
 [[package]]
 name = "sentin8-audit"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "async-trait",
  "chrono",
@@ -3983,7 +3980,7 @@ dependencies = [
 [[package]]
 name = "sentin8-auth-client"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "base64 0.22.1",
  "chrono",
@@ -4009,12 +4006,12 @@ dependencies = [
 [[package]]
 name = "sentin8-build-info"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 
 [[package]]
 name = "sentin8-bus-client"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "chrono",
  "reqwest 0.12.28",
@@ -4033,7 +4030,7 @@ dependencies = [
 [[package]]
 name = "sentin8-bus-contracts"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "chrono",
  "serde",
@@ -4045,7 +4042,7 @@ dependencies = [
 [[package]]
 name = "sentin8-config"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "dotenvy",
  "figment",
@@ -4060,7 +4057,7 @@ dependencies = [
 [[package]]
 name = "sentin8-crypto"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "aes-gcm",
  "base64 0.22.1",
@@ -4073,7 +4070,7 @@ dependencies = [
 [[package]]
 name = "sentin8-errors"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "anyhow",
  "axum",
@@ -4087,7 +4084,7 @@ dependencies = [
 [[package]]
 name = "sentin8-fapiclient"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "base64 0.22.1",
  "chrono",
@@ -4111,7 +4108,7 @@ dependencies = [
 [[package]]
 name = "sentin8-idempotency"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "async-trait",
  "axum",
@@ -4126,7 +4123,7 @@ dependencies = [
 [[package]]
 name = "sentin8-jwt"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "base64 0.22.1",
  "serde",
@@ -4136,7 +4133,7 @@ dependencies = [
 [[package]]
 name = "sentin8-m2m"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "base64 0.22.1",
  "chrono",
@@ -4156,7 +4153,7 @@ dependencies = [
 [[package]]
 name = "sentin8-membus"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "futures-util",
  "sentin8-config",
@@ -4173,7 +4170,7 @@ dependencies = [
 [[package]]
 name = "sentin8-middleware"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "axum",
  "chrono",
@@ -4203,7 +4200,7 @@ dependencies = [
 [[package]]
 name = "sentin8-openapi"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "axum",
  "utoipa",
@@ -4212,7 +4209,7 @@ dependencies = [
 [[package]]
 name = "sentin8-outbox"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "anyhow",
  "sentin8-bus-client",
@@ -4263,7 +4260,7 @@ dependencies = [
 [[package]]
 name = "sentin8-registration"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "anyhow",
  "serde",
@@ -4274,7 +4271,7 @@ dependencies = [
 [[package]]
 name = "sentin8-rfw"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "serde",
  "serde_json",
@@ -4284,7 +4281,7 @@ dependencies = [
 [[package]]
 name = "sentin8-service-discovery"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "chrono",
  "futures-util",
@@ -4300,7 +4297,7 @@ dependencies = [
 [[package]]
 name = "sentin8-shell"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "anyhow",
  "axum",
@@ -4330,7 +4327,7 @@ dependencies = [
 [[package]]
 name = "sentin8-shield"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4359,7 +4356,7 @@ dependencies = [
 [[package]]
 name = "sentin8-tls"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "anyhow",
  "axum",
@@ -4396,7 +4393,7 @@ dependencies = [
 [[package]]
 name = "sentin8-tls-contracts"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "chrono",
  "sentin8-errors",
@@ -4408,7 +4405,7 @@ dependencies = [
 [[package]]
 name = "sentin8-workload-registry"
 version = "0.1.0"
-source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.13#cff86397dff5df18ab8e2af49e48ce0cc0b47296"
+source = "git+https://github.com/Sentin8/sentin8-sdk?tag=sdk-v0.6.14#fbfd569e0360d04888232efc7e8cbc1a37961486"
 dependencies = [
  "sentin8-config",
  "sentin8-middleware",
@@ -4683,18 +4680,18 @@ checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
 name = "smallvec"
-version = "1.16.3"
+version = "1.16.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b3dc8af474f516a851ff4bd12db780f948b9250ad37211e4eec0bccea54e01b"
+checksum = "d0d5d4b1981b8bbbb7aed204cae5726d683d5d6ac7e74ec54122ea28f315e7c8"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "smol_str"
-version = "0.3.6"
+version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4aaa7368fcf4852a4c2dd92df0cace6a71f2091ca0a23391ce7f3a31833f1523"
+checksum = "eeb7109d23f319619d4cc0de5464613c8b7b1a09db2774a58101459cf6be2f10"
 dependencies = [
  "borsh",
  "serde_core",
@@ -5166,9 +5163,9 @@ dependencies = [
 
 [[package]]
 name = "tinystr"
-version = "0.8.4"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1e27c91459209c2986af3dcf603a5a74a4368754ce37414f59acc971167f643"
+checksum = "abc840c238154d58f9e86b2792261edfde565a17696e1cda1a449de27979801a"
 dependencies = [
  "displaydoc",
  "zerovec",
@@ -5182,9 +5179,9 @@ checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 
 [[package]]
 name = "tokio"
-version = "1.53.3"
+version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce3335fa71841cda333a58d7615b03901380ecf09d59b3296d21f8bbac0dde4e"
+checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
  "bytes",
  "libc",
@@ -5683,9 +5680,9 @@ dependencies = [
 
 [[package]]
 name = "uuid"
-version = "1.28.0"
+version = "1.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cc1186384beb7dd8eedea376413fd654937285ea6c9cfbb928dc3043ea4b606"
+checksum = "4a0e2d11620c50695fe12bbbfde96b3477fe606e7284c22d505c12ce51214514"
 dependencies = [
  "getrandom 0.4.3",
  "js-sys",
@@ -5870,9 +5867,9 @@ dependencies = [
 
 [[package]]
 name = "webpki-root-certs"
-version = "1.0.9"
+version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b96554aa2acc8ccdb7e1c9a58a7a68dd5d13bccc69cd124cb09406db612a1c9b"
+checksum = "e49d0e65abc00c142e8f9428da991da9f1a250c39be97459901eb12b9b49f62a"
 dependencies = [
  "rustls-pki-types",
 ]
@@ -5883,14 +5880,14 @@ version = "0.26.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "521bc38abb08001b01866da9f51eb7c5d647a19260e00054a8c7fd5f9e57f7a9"
 dependencies = [
- "webpki-roots 1.0.9",
+ "webpki-roots 1.0.11",
 ]
 
 [[package]]
 name = "webpki-roots"
-version = "1.0.9"
+version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dcd9d09a39985f5344844e66b0c530a33843579125f23e21e9f0f220850f22a"
+checksum = "f5f280bbb2b287bc8e7de7e3852945a0ff50d1bbcb5ed42b6c7a568c546df171"
 dependencies = [
  "rustls-pki-types",
 ]
@@ -6186,9 +6183,9 @@ dependencies = [
 
 [[package]]
 name = "yoke"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "709fe23a0424b6a435d82152b1bd3fdfb0833487d5fa90d05d42762a9891fef5"
+checksum = "417ef3fcf6c300b7dbd25c85531a746931c02ad536f3cf4786ed1e88223340b3"
 dependencies = [
  "stable_deref_trait",
  "yoke-derive",
@@ -6267,9 +6264,9 @@ dependencies = [
 
 [[package]]
 name = "zerovec"
-version = "0.11.8"
+version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb0464e17806c1d976d5cba29399c7f08e516e279e2ba493f63123b5fca67dd8"
+checksum = "f58a2799cfe9a1670c7ea8edbd52ef8edb93cb37a7f83bf31ba9e35d9dae6a40"
 dependencies = [
  "yoke",
  "zerofrom",
@@ -6278,9 +6275,9 @@ dependencies = [
 
 [[package]]
 name = "zerovec-derive"
-version = "0.11.6"
+version = "0.11.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34df6fc39dbd26ddc9c10e6a2984476e13acce22e64e4487636ef494369225da"
+checksum = "c3743ddbf47738d929cd1ae2e199d40d0162979dfe31aef8ae646d2bf00bf97a"
 dependencies = [
  "proc-macro2",
  "quote",
