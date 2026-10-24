@@ -112,6 +112,7 @@ fn platform_service_for_label(label: &str) -> Option<String> {
         ("post", "sentin8:post"),
         ("stat", "sentin8:stat"),
         ("secrets", "sentin8:secrets"),
+        ("sign", "sentin8:sign"),
         ("func", "sentin8:func"),
         ("cron", "sentin8:cron"),
         ("flow", "sentin8:flow"),
