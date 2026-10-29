@@ -41,7 +41,7 @@ pub mod tls_acceptor;
 pub mod tls_proxy;
 /// Traffic split (IPv4/IPv6, local/private detection).
 pub mod traffic_split;
-/// Idle upstream-connection pool for the L7 bridge (PROXY-5).
+/// Idle upstream-connection pool for the L7 bridge .
 pub mod upstream_idle_pool;
 /// Upstream TLS connections (service-to-service).
 pub mod upstream_tls;

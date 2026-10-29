@@ -58,7 +58,7 @@ fn resolve_service_name(
 /// subdomains) with the built-in core-platform table as the fallback.
 /// Returns `None` for anything that is not exactly that shape - tenant
 /// hostnames go through the Sys owner API (`GET /v1/resolve/hostname`).
-/// Parity with `sentin8-tls` `static_platform_mapping` (TLS-RLS-4); two
+/// Parity with `sentin8-tls` `static_platform_mapping`; two
 /// implementations because the proxy's mapping type is its own.
 fn static_platform_mapping(hostname: &str) -> Option<DomainMapping> {
     let cfg = sentin8::config::Sentin8Config::from_env();
@@ -171,7 +171,7 @@ impl DomainResolver {
     /// Resolve it.
     pub fn resolve(&self, hostname: &str) -> Option<DomainMapping> {
         // 0. Platform-plane SNIs resolve STATICALLY - no cache, no sys
-        // call, no SQL (TLS-RLS-4 parity with every service's embedded
+        // call, no SQL (parity with every service's embedded
         // sentin8-tls resolver; proxy DESIGN §3). `auth.ops.sys.<domain>`
         // → well-known SYSTEM_ORG_ID/SYSTEM_ENV_ID + the label→service map
         // captain propagates via `SENTIN8_TLS_PLATFORM_LABELS`.

@@ -29,13 +29,13 @@ struct L7MetricsInner {
     handshake_errors: u64,
     /// Total policy blocks (WAF, rate limit, path ACL).
     policy_blocks: u64,
-    /// PROXY-5: requests served on a WARM pooled upstream (no
+    /// requests served on a WARM pooled upstream (no
     /// TCP+TLS setup paid).
     upstream_warm: u64,
-    /// PROXY-5: requests that paid a fresh upstream connect
+    /// requests that paid a fresh upstream connect
     /// (pool miss - includes the PQ handshake).
     upstream_cold: u64,
-    /// PROXY-5: stale pooled connections discarded + retried fresh.
+    /// stale pooled connections discarded + retried fresh.
     upstream_stale_retries: u64,
 }
 
@@ -84,7 +84,7 @@ impl L7Metrics {
         inner.policy_blocks += 1;
     }
 
-    /// PROXY-5: count one upstream acquisition - warm pooled vs cold
+    /// count one upstream acquisition - warm pooled vs cold
     /// fresh connect (the cold path pays TCP + PQ TLS handshake).
     pub fn record_upstream_connect(&self, established_fresh: bool) {
         let mut inner = self.inner.lock();
@@ -95,7 +95,7 @@ impl L7Metrics {
         }
     }
 
-    /// PROXY-5: count one stale pooled upstream discarded + retried
+    /// count one stale pooled upstream discarded + retried
     /// fresh (backend respawned under a pooled socket).
     pub fn record_upstream_stale_retry(&self) {
         let mut inner = self.inner.lock();
@@ -133,11 +133,11 @@ pub struct L7MetricsSnapshot {
     pub handshake_errors: u64,
     /// Requests blocked by route policy.
     pub policy_blocks: u64,
-    /// PROXY-5: requests served on a warm pooled upstream.
+    /// requests served on a warm pooled upstream.
     pub upstream_warm: u64,
-    /// PROXY-5: requests that paid a fresh upstream connect.
+    /// requests that paid a fresh upstream connect.
     pub upstream_cold: u64,
-    /// PROXY-5: stale pooled upstreams discarded + retried fresh.
+    /// stale pooled upstreams discarded + retried fresh.
     pub upstream_stale_retries: u64,
 }
 
@@ -204,7 +204,7 @@ pub fn spawn_l7_metrics_flush(metrics: L7Metrics, valkey_url: String, flush_inte
                 );
             }
 
-            // PROXY-5 upstream pool counters (window counts).
+            // upstream pool counters (window counts).
             if snapshot.upstream_warm > 0 {
                 http_metrics.insert(
                     "proxy.http.external→proxy.upstream_warm".to_string(),

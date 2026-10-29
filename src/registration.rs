@@ -26,7 +26,7 @@ const M2M_GRANTS: &[M2mGrant] = &[
         workload: "sentin8:proxy-policy",
         scopes: &["sentin8:bus:consume", "sentin8:stat:measure"],
     },
-    // TLS-RLS-4 (design/sentin8-vertical-data-plane-contract.md §VDC.7): the database-free HostContextResolver’s resolve workload - cache miss calls Sys `GET /v1/resolve/hostname`.
+    // (design/sentin8-vertical-data-plane-contract.md §VDC.7): the database-free HostContextResolver’s resolve workload - cache miss calls Sys `GET /v1/resolve/hostname`.
     M2mGrant {
         workload: "sentin8-proxy-tls",
         scopes: &["sentin8:sys:instances:read"],
@@ -55,7 +55,7 @@ const PG_ROLES: &[PgRole] = &[PgRole {
         // API (`GET /v1/resolve/hostname`, `sentin8-proxy-tls` workload).
         // The subdomain→service map is read on every domain-event reload +
         // 30s poll (crates/config `load_subdomain_map`) and by the embedded
-        // TLS context resolver (`resolve_service_name_in_tx`) - PROXY-2,
+        // TLS context resolver (`resolve_service_name_in_tx`) -,
         // proxy DESIGN §3.
         CrossSchemaGrant {
             schema: "sys",

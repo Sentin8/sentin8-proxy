@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:Proxy
 // SPDX-License-Identifier: Apache-2.0
 
-//! Idle-connection pool for L7 upstreams (PROXY-5, proxy DESIGN §7).
+//! Idle-connection pool for L7 upstreams (proxy DESIGN §7).
 //!
 //! The L7 bridge previously opened a fresh `upstream_tls::connect()` per
 //! proxied request, paying a full post-quantum TLS handshake
@@ -97,7 +97,7 @@ impl UpstreamPool {
     }
 
     /// Put a healthy upstream connection back for reuse (HTTP/1.1
-    /// keep-alive cycle completed - PROXY-5). Called by the L7 pipe when
+    /// keep-alive cycle completed -). Called by the L7 pipe when
     /// the response was fully framed; a close-delimited or failed pipe
     /// discards the connection instead (stale/garbage state -
     /// never re-pooled).

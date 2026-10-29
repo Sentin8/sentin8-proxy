@@ -109,7 +109,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
     // health payload (AppState → handlers::health) share one counter.
     let connection_gauge = std::sync::Arc::new(crate::tls_proxy::L7ConnectionGauge::new());
 
-    // PROXY-5: the idle upstream pool is built HERE (before both AppState
+    // the idle upstream pool is built HERE (before both AppState
     // and the L7 state) so the mgmt health payload and the L7 data path
     // share ONE pool instance.
     let upstream_pool = crate::upstream_idle_pool::UpstreamPool::new();
@@ -220,7 +220,7 @@ pub async fn serve(config: ProxConfig) -> anyhow::Result<()> {
             .await;
     });
 
-    // ── 3b. Optional plain-HTTP challenge listener (:80, DEVDOM-2,
+    // ── 3b. Optional plain-HTTP challenge listener (: 80,
     // acme DESIGN §4.3). Upstream ACME CAs validate HTTP-01 by fetching
     // http://{domain}/.well-known/acme-challenge/{token} on port 80 -
     // this listener forwards those GETs to acme and 404s everything
@@ -538,7 +538,7 @@ async fn handle_l4_passthrough(
 }
 
 /// Serve ONE plain-HTTP request on the :80 challenge listener
-/// (DEVDOM-2, acme DESIGN §4.3): `GET /.well-known/acme-challenge/{token}`
+/// (acme DESIGN §4.3): `GET /.well-known/acme-challenge/{token}`
 /// is forwarded to an Active acme instance over TLS (the same
 /// cert-resolved HTTPS surface acme always serves - IP pinned to the
 /// picked instance, SNI set to acme's platform hostname, the pattern

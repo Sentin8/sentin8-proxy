@@ -72,7 +72,7 @@ impl PolicyEngine {
         headers: &HeaderMap,
         body: &[u8],
     ) -> PolicyOutcome {
-        // 1. Rate limiting - keyed `(client_ip, host)` (PROXY-3, proxy README
+        // 1. Rate limiting - keyed `(client_ip, host)` (proxy README
         // §7): the SNI/Host pair is the tenant identity at the L7 bridge, so a
         // burst against one app must not exhaust every other host's budget.
         if self.config.rate_limit_enabled && !self.rate_limiter.check(client_ip, host) {

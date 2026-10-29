@@ -109,7 +109,7 @@ pub struct L7State {
     pub metrics: L7Metrics,
     /// In-flight connection gauge - the drain signal (proxy README §7).
     pub connection_gauge: Arc<L7ConnectionGauge>,
-    /// PROXY-5: idle upstream-connection pool - warmed TLS/TCP
+    /// idle upstream-connection pool - warmed TLS/TCP
     /// sessions per (backend_addr, sni), removing the per-request PQ
     /// handshake from proxied requests.
     pub upstream_pool: UpstreamPool,
@@ -249,7 +249,7 @@ pub async fn handle_l7_connection(
             mtls_key_path: state.mtls_key_path.clone(),
         };
 
-        // PROXY-5: pool-first acquisition (warm conn skips the handshake).
+        // pool-first acquisition (warm conn skips the handshake).
         let (upstream, established_fresh) = match upstream_idle_pool::acquire(
             &state.upstream_pool,
             &backend_addr,
@@ -339,7 +339,7 @@ pub async fn handle_l7_connection(
     // 6. Inject X-Sentin8-* tenant context headers.
     let mut injected_headers =
         header_injector::inject_tenant_headers(&parsed.headers, &mapping, &host);
-    // PROXY-4: forward the mTLS client certificate (base64 DER) so the
+    // forward the mTLS client certificate (base64 DER) so the
     // backend's mTLS consumer can verify it - never a client-supplied value
     // (stripped by the injector), always the certificate this connection
     // terminated. Absent when no client certificate was presented.
@@ -376,7 +376,7 @@ pub async fn handle_l7_connection(
         }
     };
 
-    // 8. Connect to the backend - pool-first (PROXY-5): a warm pooled
+    // 8. Connect to the backend - pool-first : a warm pooled
     // connection skips the TCP + PQ TLS handshake entirely; a miss
     // connects fresh (and is refilled for the next request). A stale
     // pooled connection (backend respawned) fails transport once; the
@@ -451,7 +451,7 @@ pub async fn handle_l7_connection(
     };
 
     // 9. Forward the request to the backend and pipe the response back.
-    // PROXY-5: a FIRST transport error on this (possibly pooled) upstream
+    // a FIRST transport error on this (possibly pooled) upstream
     // is treated as a stale connection - discard and retry ONCE on a
     // fresh connect. The retry metric keeps stale-conn artifacts
     // observable without surfacing them as 502s.
@@ -473,7 +473,7 @@ pub async fn handle_l7_connection(
                 %client_addr,
                 %host,
                 error = %stale_err,
-                "proxy L7: upstream transport error - retrying once on a fresh connection (PROXY-5)"
+ "proxy L7: upstream transport error - retrying once on a fresh connection "
             );
             state.metrics.record_upstream_stale_retry();
             match upstream_tls::connect(&backend_addr, &host, &upstream_config).await {
@@ -528,11 +528,11 @@ enum ForwardOutcome {
     /// [`pipe_response`] - the caller never touches the socket again.
     Done { status: u16 },
     /// Transport failed before any response byte reached the client -
-    /// the caller retries once on a fresh connection (PROXY-5).
+    /// the caller retries once on a fresh connection .
     Stale(String),
 }
 
-/// PROXY-5 retryable forward: a transport failure **before any response
+/// retryable forward: a transport failure **before any response
 /// byte reaches the client** (the request-write phase) returns
 /// [`ForwardOutcome::Stale`] instead of writing a 502 - the caller
 /// retries once on a fresh connection. Once the response pipe has
@@ -570,7 +570,7 @@ async fn forward_request_once(
 }
 
 /// Read the HTTP response from the backend and pipe it to the client's
-/// TLS stream, WITH ENVELOPE FRAMING (PROXY-5).
+/// TLS stream, WITH ENVELOPE FRAMING .
 ///
 /// Buffers until the header block (\r\n\r\n) is complete, parses the
 /// status + framing header, and streams the body. When the response is
@@ -586,7 +586,7 @@ async fn forward_request_once(
 /// pool needs the CONCRETE stream type to hand off, which a generic `R`
 /// cannot name.
 ///
-/// PROXY-5 stale class: an EOF/read error BEFORE any response byte
+/// stale class: an EOF/read error BEFORE any response byte
 /// reaches the client returns [`ForwardOutcome::Stale`] - the caller
 /// retries once on a fresh connection. Once bytes reached the client
 /// the request is committed: never retried (double-delivery).
@@ -777,7 +777,7 @@ async fn pipe_framed<S: AsyncReadExt + Unpin>(
                 }
             }
             let _ = client_tls.flush().await;
-            // PROXY-5 keep-alive: framed cycle complete - the stream is
+            // keep-alive: framed cycle complete - the stream is
             // RECOVERED (pipe_response moves it into the pool).
             PipedStream {
                 outcome: ForwardOutcome::Done {

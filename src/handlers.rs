@@ -24,7 +24,7 @@ pub struct AppState {
     pub backends: SharedServiceBackendRegistry,
     /// The mappings.
     pub mappings: MappingCache,
-    /// Shield engine (.16 - ): step 5 gates the
+    /// Shield engine (.16): step 5 gates the
     /// management API. The data plane (SNI/L7 bridge) is transport, not
     /// authorization - tenant isolation rides the X-Sentin8-* context
     /// headers the upstream services enforce.
@@ -39,7 +39,7 @@ pub struct AppState {
     /// proxy cannot see inside).
     /// The connection gauge.
     pub connection_gauge: Option<std::sync::Arc<crate::tls_proxy::L7ConnectionGauge>>,
-    /// PROXY-5 idle upstream pool - occupancy reported in the health
+    /// idle upstream pool - occupancy reported in the health
     /// payload (`upstream_pool_size`).
     /// The upstream pool.
     pub upstream_pool: crate::upstream_idle_pool::UpstreamPool,
@@ -71,7 +71,7 @@ pub async fn health(State(state): State<AppState>) -> Json<serde_json::Value> {
     if let Some(ref gauge) = state.connection_gauge {
         payload["active_connections"] = serde_json::Value::from(gauge.active_connections());
     }
-    // PROXY-5 upstream pool occupancy (observability - pool health).
+    // upstream pool occupancy (observability - pool health).
     payload["upstream_pool_size"] = serde_json::Value::from(state.upstream_pool.len());
     Json(payload)
 }

@@ -93,7 +93,7 @@ pub fn inject_tenant_headers(
     new_headers
 }
 
-/// Forward the client's mTLS certificate (PROXY-4, proxy README §7):
+/// Forward the client's mTLS certificate (proxy README §7):
 /// the DER leaf certificate, base64-encoded, as `X-Sentin8-Client-Cert` -
 /// the backend's mTLS consumer can verify it against the platform CA
 /// without holding the TLS connection. Client-supplied copies of the

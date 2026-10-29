@@ -58,7 +58,7 @@ pub struct ProxConfig {
     /// The internal port.
     pub internal_port: u16,
     /// Plain-HTTP listener port for upstream ACME HTTP-01 challenge
-    /// validation (DEVDOM-2, acme DESIGN §4.3). Serves ONLY
+    /// validation (acme DESIGN §4.3). Serves ONLY
     /// `/.well-known/acme-challenge/*` (forwarded to acme); everything
     /// else a fixed 404. 0/unset = listener not bound (external
     /// issuance disabled). Default 80 when the operator enables it.

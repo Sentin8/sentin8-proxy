@@ -71,7 +71,7 @@ graph TD
 - **Upstream TLS** - service-to-service connections use the shared PQ
   TLS stack (X25519MLKEM768, ML-DSA-65; no classical fallback).
 - **Upstream connection pooling (L7)** - L7 upstream sessions are
-  pooled per (backend, SNI) and reused across requests (PROXY-5): a
+  pooled per (backend, SNI) and reused across requests : a
   warm pooled connection removes the ~40 ms PQ handshake from proxied
   requests; a stale pooled connection (backend respawned) fails the
   request write once and the request retries on a fresh connection.
@@ -97,8 +97,8 @@ graph TD
   platform's anti-spoofing boundary).
 - **`L7Metrics` / `L7MetricsSnapshot`** - per-(service, status) request
   counts, latency aggregates, handshake errors, policy blocks, and the
-  upstream warm/cold/stale-retry counters (PROXY-5 pool health).
-- **`UpstreamPool`** - the idle upstream-connection pool (PROXY-5):
+  upstream warm/cold/stale-retry counters (pool health).
+- **`UpstreamPool`** - the idle upstream-connection pool :
   per-(backend_addr, sni) warmed TLS/TCP sessions handed out before a
   fresh connect; one pooled connection serves one request (no
   pipelining); 30s idle eviction + a 1-connection-per-backend cap.
@@ -183,7 +183,7 @@ graph TD
     backend (Sentin8:Auth binds the forwarded cert's thumbprint
     against the registration row; an unregistered cert authenticates
     nothing). The presented leaf is forwarded as base64
-    `X-Sentin8-Client-Cert` (PROXY-4); client-supplied copies of that
+    `X-Sentin8-Client-Cert`; client-supplied copies of that
     header are stripped first.
 - **Boot.** Self-issued bootstrap certificate → backend registry load →
   domain resolver (membus consumer + bus consumer + safety poll) →
