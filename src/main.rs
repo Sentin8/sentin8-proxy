@@ -62,7 +62,10 @@ async fn main() -> anyhow::Result<()> {
     // Install the Graviola PQ crypto provider before any reqwest HTTPS call
     // (policy admin/verify clients, TLS sync - reqwest panics "No provider
     // set" otherwise; COLD-START-1).
-    let _ = sentin8::tls::crypto::sentin8_pq_provider().install_default();
+    // Platform PQ provider (PQCLIENT-1): PQ verification + ML-DSA key
+    // loading - the proxy presents the platform's exclusive-family
+    // material on every listener and outbound call.
+    sentin8::tls::crypto::install_platform_provider();
 
     let _ = dotenvy::dotenv();
     let _ = sentin8::middleware::error_metrics::init_tracing_with_metrics(
