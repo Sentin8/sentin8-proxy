@@ -138,7 +138,7 @@ pub struct DomainResolver {
     /// hostname → app instance mapping
     apps: Arc<RwLock<HashMap<String, AppRow>>>,
     /// Known service types from sentin8_vertical_services + platform services.
-    /// e.g. {"sentin8:auth", "sentin8:storage", "bank8:ledger", "bank8:fdx", ...}
+    /// e.g. {"sentin8:auth", "sentin8:storage", "bank8:ledger", "openfin8:ca", ...}
     known_services: Arc<RwLock<HashSet<String>>>,
     /// Map from subdomain label → full service_type.
     /// e.g. {"auth" → "sentin8:auth", "func" → "sentin8:func",
