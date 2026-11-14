@@ -6,7 +6,6 @@
 use std::sync::Arc;
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::TcpListener;
 
 /// Mint a self-signed EC P-256 client cert (DER) + key (PKCS8 DER).
 fn self_signed_client() -> (Vec<u8>, Vec<u8>) {
@@ -151,8 +150,6 @@ async fn allow_self_signed_accepts_self_signed_client() {
     server.await.expect("server task");
 }
 
-use rustls::client::danger::ServerCertVerifier as _;
-use rustls::server::danger::ClientCertVerifier as _;
 
 /// A client verifier that trusts exactly the test server cert.
 #[derive(Debug)]
