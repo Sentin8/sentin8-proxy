@@ -72,6 +72,55 @@ export SENTIN8_RUN_DIR="$(TREE_ROOT)/.run"; \
 export SENTIN8_LOG_DIR="$(TREE_ROOT)/.run/logs"; \
 export SENTIN8_CAPTAIN_SOCK="$(TREE_ROOT)/.run/captain.sock"
 endef
+# Ingress bind precondition (PORTBIND-1, packaging DESIGN §4.1). This
+# service is the one low-port listener: :443, plus the ACME :80 listener
+# when SENTIN8_PROXY_HTTP_PORT is set. Linux refuses ports below
+# `net.ipv4.ip_unprivileged_port_start` (kernel default 1024) with EACCES,
+# so a source/dev host fails at bind after the boot has already started.
+# Check before spawning and print the exact remedy. Packaged hosts need
+# nothing (the unit grants CAP_NET_BIND_SERVICE); the appliance's container
+# starts as root. A `setcap` xattr cannot be the dev mechanism - cargo
+# writes a new inode per build, so machine policy is the correct lever.
+# The lowest port actually needed: :443 always, plus the ACME :80 listener
+# when enabled (the root env file wins so the advice matches the fleet).
+PROXY_ENV_HTTP_PORT = $(shell grep -h '^SENTIN8_PROXY_HTTP_PORT=' $(ROOT_ENV) 2>/dev/null | tail -1 | cut -d= -f2 | tr -d '\r')
+PROXY_HTTP_PORT = $(or $(SENTIN8_PROXY_HTTP_PORT),$(PROXY_ENV_HTTP_PORT))
+PROXY_INGRESS_LOWEST_PORT = $(if $(filter-out 0,$(PROXY_HTTP_PORT)),$(PROXY_HTTP_PORT),443)
+define ingress_port_check
+if [ -r /proc/sys/net/ipv4/ip_unprivileged_port_start ]; then \
+	floor=$$(cat /proc/sys/net/ipv4/ip_unprivileged_port_start); \
+	if [ "$$floor" -gt $(PROXY_INGRESS_LOWEST_PORT) ]; then \
+		echo "ERROR: this host refuses to bind ports below $$floor (net.ipv4.ip_unprivileged_port_start)," >&2; \
+		echo "       but sentin8:proxy needs :$(PROXY_INGRESS_LOWEST_PORT). Grant it for this session and persist:" >&2; \
+		echo "         sudo sysctl -w net.ipv4.ip_unprivileged_port_start=$(PROXY_INGRESS_LOWEST_PORT)" >&2; \
+		echo "         echo 'net.ipv4.ip_unprivileged_port_start=$(PROXY_INGRESS_LOWEST_PORT)' | sudo tee /etc/sysctl.d/99-sentin8-ingress.conf" >&2; \
+		echo "       (or let make do both: make ingress-port)" >&2; \
+		echo "       (packaged hosts need nothing - the unit grants CAP_NET_BIND_SERVICE; packaging DESIGN §4.1)" >&2; \
+		exit 1; \
+	fi; \
+fi
+endef
+
+# The same remedy as a target (mirrors the group Makefile's ingress-port):
+# one sudo prompt applies the live value and the persistent drop-in. The
+# value is derived from the root env, never hardcoded. Explicit target only -
+# a boot must not escalate privileges on its own.
+ingress-port: ## Dev host: allow the ingress low ports (sudo sysctl + persistent drop-in)
+	@if [ ! -r /proc/sys/net/ipv4/ip_unprivileged_port_start ]; then \
+		echo "This kernel has no ip_unprivileged_port_start - nothing to do."; exit 0; \
+	fi; \
+	floor=$$(cat /proc/sys/net/ipv4/ip_unprivileged_port_start); \
+	if [ "$$floor" -le $(PROXY_INGRESS_LOWEST_PORT) ]; then \
+		echo "OK: this host already binds ports below $$floor, so the ingress can hold :$(PROXY_INGRESS_LOWEST_PORT)."; \
+		exit 0; \
+	fi; \
+	echo "→ granting ports below $(PROXY_INGRESS_LOWEST_PORT) - sudo password required"; \
+	sudo sysctl -w net.ipv4.ip_unprivileged_port_start=$(PROXY_INGRESS_LOWEST_PORT) >/dev/null || exit 1; \
+	printf '%s\n' 'net.ipv4.ip_unprivileged_port_start=$(PROXY_INGRESS_LOWEST_PORT)' \
+		| sudo tee /etc/sysctl.d/99-sentin8-ingress.conf >/dev/null || exit 1; \
+	echo "→ persisted to /etc/sysctl.d/99-sentin8-ingress.conf (survives reboot)"; \
+	echo "→ active floor: $$(cat /proc/sys/net/ipv4/ip_unprivileged_port_start)"
+
 # Infra guarantee (RS §4.5.1-5): PG 18 + Valkey are HARD deps for most of
 # the fleet (RS §5.1). When the platform group's compose stack is down,
 # `start` brings it up and waits for accept-connections (bounded).
@@ -100,7 +149,7 @@ for t in $$types; do \
 done; \
 keys=$${keys# }
 endef
-.PHONY: help build test lint clean start stop restart upgrade key status enroll \
+.PHONY: help build test lint clean start stop restart upgrade key status enroll ingress-port \
 	$(PROFILED:%=%-release) $(PROFILED:%=%-debug)
 
 help: ## Show this help
@@ -123,6 +172,7 @@ start: ## Start THIS service: infra + trimmed boot if captain is down; idempoten
 	@test -f $(ROOT_ENV) || { echo "ERROR: no root env — create $(ROOT_ENV) (copy .env.example)" >&2; exit 1; }
 	@if [ -z "$(CLI_BIN)" ] && [ ! -f "$(CLI_DIR)/Cargo.toml" ]; then \
 		echo "ERROR: sentin8-cli not found — clone the platform group or install it" >&2; exit 1; fi
+	@$(call ingress_port_check)
 	@export SENTIN8_CAPTAIN_BINARY_PREFIX="$(PREFIX)"; \
 	export SENTIN8_PG_POOL_MAX=$${SENTIN8_PG_POOL_MAX:-8}; \
 	set -a; . $(ROOT_ENV); set +a; \

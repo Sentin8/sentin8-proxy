@@ -287,6 +287,25 @@ flowchart LR
   drain polls this gauge (captain README §7): the drain ends when the gauge hits 0
   or the 30s cap hits. L4 passthrough connections are opaque TLS pipes
   and carry no gauge.
+- **Listener bind privilege (PORTBIND-1)**: the process runs as the
+  unprivileged `sentin8` user yet holds `:443` and the optional `:80`
+  challenge listener. The capability is granted to the fleet unit, not
+  to this binary: `sentin8-captain.service` carries
+  `CapabilityBoundingSet`/`AmbientCapabilities=CAP_NET_BIND_SERVICE`, and
+  the ambient set is preserved across the whole spawn chain
+  (`sentin8-cli` → captain → this process), because the ambient set
+  survives `execve` of unprivileged binaries. A `setcap` xattr on the
+  binary is deliberately NOT the mechanism - it is inert under the
+  unit's `NoNewPrivileges=yes` and does not survive `dpkg` upgrades or
+  cargo rebuilds. A dev/source host instead lowers
+  `net.ipv4.ip_unprivileged_port_start` to the lowest ingress port it
+  will bind (`80` when the challenge listener is enabled, otherwise
+  `443`); a host still at the kernel default (`1024`) fails
+  `TcpListener::bind` with `EACCES`.
+  Packaging side: `sentin8-packaging/DESIGN.md` §4.1.
+  The port value itself stays fixed (invariant 1): consumers derive
+  scheme-default URLs, so a moved listener port breaks issuer/discovery
+  agreement rather than extending reach.
 
 ## 6. Failure Modes & Recovery
 
@@ -360,7 +379,11 @@ graph LR
 ## 8. Invariants, Insecure-Defaults Rejected, Unsafe Rationale
 
 1. **Single ingress**: backends never bind public ports; port 443 is the
-   only data-plane entry; SNI is the routing key.
+   only data-plane entry; SNI is the routing key. The port is a protocol
+   constant, not an operator knob - every consumer derives scheme-default
+   URLs from the hostname alone, so moving the listener breaks
+   issuer/discovery agreement instead of extending reach (§5,
+   `sentin8-packaging/DESIGN.md` §4.1).
 2. **Client-supplied `X-Sentin8-*` headers are always stripped** before
    any injection (anti-spoofing boundary - test-pinned for the 3 core
    cases).
