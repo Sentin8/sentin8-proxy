@@ -397,7 +397,15 @@ graph LR
 7. The data plane performs no authorization (transport, not policy);
    Shield gates the management API only.
 8. Fail-closed tenant resolution - an unresolvable hostname is rejected,
-   never defaulted to a system mapping.
+   never defaulted to a system mapping. **And one domain per fleet: the
+   tenant-shape path must reject a hostname outside `SENTIN8_DOMAIN`
+   before it attempts any suffix split (PXYSUFFIX-1).** Today only the
+   static platform path (`{label}.ops.sys.{domain}`) compares against the
+   configured root; the tenant fallback accepts any
+   `{service}.{env}.{org_domain}` whose service label resolves, so a
+   stale SNI from an earlier campaign keeps being served after a domain
+   change. The rule matches acme (which signs only the configured root)
+   and `sentin8-tls` (whose resolver is suffix-exact).
 9. `internal_port` is config-only today (no second listener bound);
    internal traffic is detected by source IP on the single listener.
 10. No `unsafe` code; SNI peek is non-destructive (`TcpStream::peek`).
