@@ -621,7 +621,10 @@ async fn forward_challenge_to_acme(
     let sentin8_domain =
         std::env::var("SENTIN8_DOMAIN").unwrap_or_else(|_| "local.sentin8.dev".to_string());
     let sni_host = format!("acme.ops.sys.{sentin8_domain}");
-    let url = format!("https://{sni_host}:{port}{path}");
+    // ADDRESSING: a platform hostname URL never carries a port. The port
+    // rides the pinned SocketAddr and reqwest applies it because the URL
+    // has no explicit port.
+    let url = format!("https://{sni_host}{path}");
     let client = reqwest::Client::builder()
         .connect_timeout(Duration::from_secs(3))
         .timeout(Duration::from_secs(10))
