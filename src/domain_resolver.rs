@@ -147,6 +147,8 @@ pub struct DomainResolver {
     /// Used to resolve the first hostname label to a service without
     /// ad-hoc `sentin8-` prefix prepending.
     subdomain_map: Arc<RwLock<HashMap<String, String>>>,
+    /// Owner-API client used on an app-hostname cache miss.
+    sys: Arc<SysHostResolver>,
 }
 
 #[derive(Debug, Clone)]
@@ -157,6 +159,27 @@ struct AppRow {
     app_id: Uuid,
 }
 
+/// `bff.`-prefixed hostnames are the BFF form of an app instance; everything
+/// else that resolves to an app instance is the SPA hostname.
+fn looks_like_app_bff(hostname: &str) -> bool {
+    hostname
+        .split('.')
+        .next()
+        .is_some_and(|label| label.eq_ignore_ascii_case("bff"))
+}
+
+/// Owner-API client for `GET /v1/resolve/hostname`.
+///
+/// This is the documented replacement for the retired `app_instances`
+/// SELECT: sys owns the authoritative `hostname -> (org, env, app)` map, and
+/// answers for BOTH the frontend and the `bff.` form of an instance
+/// hostname. Rather than re-implement the resolve contract here (M2M
+/// certificate, static platform rules, positive/negative caching), the proxy
+/// reuses `sentin8-tls`'s `HostContextResolver` - the same component every
+/// backend already uses on its cache-miss path, and the one this module's
+/// own comments nominate as the owner-API client.
+pub use sentin8::tls::context::HostContextResolver as SysHostResolver;
+
 impl DomainResolver {
     /// Handle new.
     pub fn new() -> Self {
@@ -164,6 +187,10 @@ impl DomainResolver {
             apps: Arc::new(RwLock::new(HashMap::new())),
             known_services: Arc::new(RwLock::new(HashSet::new())),
             subdomain_map: Arc::new(RwLock::new(HashMap::new())),
+            sys: Arc::new(SysHostResolver::new(
+                sentin8::tls::cache::MappingCache::new(),
+                "sentin8:proxy",
+            )),
         }
     }
 
@@ -257,6 +284,85 @@ impl DomainResolver {
         }
 
         None
+    }
+
+    /// Resolve a hostname, asking Sys on a cache miss.
+    ///
+    /// [`resolve`](Self::resolve) alone cannot answer for an APP-INSTANCE
+    /// hostname: the `app_instances` SELECT was retired (D7-PXY) and nothing
+    /// ever writes `apps`, so `bff.{app}` hostnames fall through to the
+    /// generic tenant branch and come back WITHOUT an `application_id`.
+    ///
+    /// That omission is not cosmetic. The BFF enforces D2 (session ->
+    /// application binding) and rejects `(Some(session_app), None)` with 401
+    /// "session not valid for this application". In practice it broke NATIVE
+    /// sign-in: the handoff itself succeeded (`/auth/native/exchange -> 200`)
+    /// and the very next `/auth/session` was rejected, leaving the app stuck
+    /// on its landing page.
+    ///
+    /// The owner API is the documented replacement source. The resolved row
+    /// is cached in `apps`, so the next request is a plain map hit.
+    pub async fn resolve_with_sys(&self, hostname: &str) -> Option<DomainMapping> {
+        // Fast path: answer from the local caches and static rules. A tenant
+        // mapping without an app id is exactly the degraded shape this method
+        // exists to repair, so keep looking in that case.
+        let local = self.resolve(hostname);
+        if let Some(m) = &local {
+            if m.application_id.is_some() || !looks_like_app_bff(hostname) {
+                return local;
+            }
+        }
+
+        // Owner API: the authoritative source for app-instance IDENTITY.
+        let resolved = match self.sys.resolve(hostname).await {
+            Some(r) => r,
+            None => {
+                tracing::warn!(
+                    %hostname,
+                    "domain resolver: owner API did not resolve an app hostname"
+                );
+                return local;
+            }
+        };
+        let Some(app_id) = resolved.application_id else {
+            // The hostname resolved but carries no app instance (an org or
+            // platform hostname): nothing to add, keep what we had.
+            return local;
+        };
+
+        // ROUTING stays local. Sys classifies every app-instance hostname as
+        // `sentin8:web` - including the `bff.` form, which must reach the BFF
+        // - so adopting its `service` here would send BFF traffic to the SPA
+        // and 404 every API call. Only the identity comes from the owner API.
+        let service = local
+            .as_ref()
+            .map_or_else(|| "sentin8:bff".to_string(), |m| m.service.clone());
+
+        let app = AppRow {
+            bff_hostname: hostname.to_string(),
+            org_id: resolved.org_id,
+            env_id: resolved.env_id,
+            app_id,
+        };
+        // Cache under the FRONTEND hostname only. `resolve()`'s exact-key
+        // branch labels a hit `sentin8:web` (the SPA), so keying the `bff.`
+        // form here would route the next BFF request to the SPA. Stored this
+        // way, the following request is still answered from local state: the
+        // exact-key branch misses and the `bff_hostname` scan matches.
+        if !resolved.hostname.is_empty() && resolved.hostname != hostname {
+            self.apps
+                .write()
+                .insert(resolved.hostname.clone(), app.clone());
+        }
+
+        Some(DomainMapping {
+            hostname: hostname.to_string(),
+            service,
+            org_id: app.org_id,
+            env_id: app.env_id,
+            application_id: Some(app.app_id),
+            backend_url: local.and_then(|m| m.backend_url),
+        })
     }
 
     /// Load known service types + subdomain mappings into the caches.
@@ -463,6 +569,36 @@ mod tests {
         let m = f.resolve("portal.prod.acme.example.com").unwrap();
         assert_eq!(m.service, "sentin8:web");
         assert_eq!(m.application_id, Some(app_id));
+    }
+
+    #[test]
+    fn cached_owner_api_row_serves_both_hostname_forms() {
+        // The shape `resolve_with_sys` caches after an owner-API hit: ONE
+        // row, keyed by the FRONTEND hostname, carrying the BFF hostname.
+        // Both forms must resolve to an app id - and critically the `bff.`
+        // form must still route to the BFF, not the SPA. Keying the row by
+        // the `bff.` hostname instead would hit `resolve()`'s exact-key
+        // branch, which labels every hit `sentin8:web`, and send all BFF
+        // API traffic to the SPA (404s).
+        let f = fixture();
+        let app_id = Uuid::new_v4();
+        *f.apps.write() = HashMap::from([(
+            "portal.prod.acme.example.com".to_string(),
+            AppRow {
+                bff_hostname: "bff.portal.prod.acme.example.com".to_string(),
+                org_id: sentin8::config::SYSTEM_ORG_ID,
+                env_id: sentin8::config::SYSTEM_ENV_ID,
+                app_id,
+            },
+        )]);
+
+        let web = f.resolve("portal.prod.acme.example.com").unwrap();
+        assert_eq!(web.service, "sentin8:web");
+        assert_eq!(web.application_id, Some(app_id));
+
+        let bff = f.resolve("bff.portal.prod.acme.example.com").unwrap();
+        assert_eq!(bff.service, "sentin8:bff");
+        assert_eq!(bff.application_id, Some(app_id));
     }
 
     #[test]
